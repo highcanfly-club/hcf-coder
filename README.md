@@ -3,6 +3,14 @@
 this is a slighty modified https://github.com/coder/code-server  
 We need to run it in our Kubernetes cluster and we need to mount our working dir via sshfs. 
 This is how we run it
+- The secret is composed with 3 datas:
+  * ssh-privatekey
+  * ssh-publickey
+  * ssh-key-type
+For example with a local ssh key:
+```sh
+kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
+```
 ```yaml
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
