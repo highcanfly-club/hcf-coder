@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p /root/.ssh
 SECRET=$(/usr/bin/secret2sshkey --secret ssh-key-secret --ssh-dir /root/.ssh)
 echo $SECRET
 IDENTITY=`echo $SECRET | awk -F ' ' '{print $3}' | awk -F '=' '{print $2}'`
