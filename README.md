@@ -74,6 +74,8 @@ spec:
           value: "22"
         - name: REMOTEDIR
           value: /usr/src/hcf-app
+        - name: APPNAME
+          value: "High Can Fly Code-Server"
         securityContext:
             privileged: true
             capabilities:
