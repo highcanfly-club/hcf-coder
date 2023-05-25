@@ -11,4 +11,4 @@ echo "mount root@$REMOTEHOST:$REMOTEDIR in $WORKDIR"
 echo "root@$REMOTEHOST:$REMOTEDIR $WORKDIR  fuse.sshfs noauto,x-systemd.automount,_netdev,users,idmap=user,AddressFamily=inet,StrictHostKeyChecking=accept-new,IdentityFile=$IDENTITY,port=$REMOTEPORT,allow_other,reconnect 0 0" >> /etc/fstab
 #sshfs -p $REMOTEPORT -o AddressFamily=inet,StrictHostKeyChecking=accept-new  root@$REMOTEHOST:$REMOTEDIR $WORKDIR
 /bin/mount $WORKDIR
-/usr/bin/entrypoint.sh --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 --app-name "$APPNAME" .
+/usr/bin/entrypoint.sh --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 --app-name \"$APPNAME\" .
