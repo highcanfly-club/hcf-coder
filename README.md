@@ -6,7 +6,8 @@ This is how we run it
 - The secret is composed with 3 datas:
   * ssh-privatekey
   * ssh-publickey
-  * ssh-key-type
+  * ssh-key-type  
+  
 For example with a local ssh key:
 ```sh
 kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
