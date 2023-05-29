@@ -17,10 +17,11 @@ RUN sudo mkdir -p /var/lib/apt/lists/partial \
   && sudo apt-get update \
   && sudo apt-get install -y \
   sshfs php-cli
-RUN sudo mkdir -p /home/coder/workdir && sudo mkdir -p /root/.ssh
+RUN sudo mkdir -p /home/coder/workdir && sudo mkdir -p /root/.ssh && sudo mkdir -p /usr/share/img
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
 COPY --from=gobuilder /app/secret2sshkey /usr/bin/secret2sshkey
 COPY scripts/start.sh /usr/bin/start.sh
+COPY hcf.png /usr/share/img/hcf.png
 RUN sudo chmod ugo+x /usr/bin/start.sh
 USER 0
 EXPOSE 8080
