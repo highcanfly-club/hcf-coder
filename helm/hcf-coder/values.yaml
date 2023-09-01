@@ -11,7 +11,11 @@ sshKeyType: ecdsa
 users:
   - user1: JDEkZGNsN2s3WkYkQ2FCTEhKTmpxYy9INjR3OTlRd3JEMAo= #openssl passwd -1 1septembre2023 | base64
   - user2: JDEkMVFjR1BIYS8kY0hHSy9KSzlRSWQwT3A3NlV0MU42Lwo= #openssl passwd -1 01septembre2023 | base64
-
+persistence:
+  enabled: false
+  size: "1Gi"
+  accessModes:
+    - ReadWriteOnce
 replicaCount: 1
 
 image:

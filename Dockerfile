@@ -41,7 +41,8 @@ RUN code-server --install-extension lokalise.i18n-ally
 RUN code-server --install-extension Vue.volar
 RUN code-server --install-extension MS-CEINTL.vscode-language-pack-fr
 RUN sudo mv /home/coder/.local /home/coder/.config /root/
-RUN sudo mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | sudo tee /root/.local/share/code-server/User/locale.json && \
+RUN sudo mkdir -p /root/.local/share/code-server/User/globalStorage && \
+      sudo mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | sudo tee /root/.local/share/code-server/User/locale.json && \
       sudo mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | sudo tee /root/.local/share/code-server/User/argv.json && \
       sudo mkdir -p /home/coder/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | sudo tee /home/coder/.vscode/settings.json
 USER 0

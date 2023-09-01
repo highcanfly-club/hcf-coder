@@ -1,0 +1,16 @@
+{{- if .Values.persistence.enabled }}
+# © Ronan LE MEILLAT 2023
+# released under the GPLv3 terms
+#########################################################################
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-hcf-coder
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  accessModes: {{ .Values.persistence.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size }}
+{{- end }}

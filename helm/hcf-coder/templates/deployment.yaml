@@ -52,6 +52,11 @@ spec:
                 add:
           ports:
           - containerPort: {{ .Values.service.port }}
+          {{ if .Values.persistence.enabled}}
+          volumeMounts:
+            - name: hcf-coder-storage
+              mountPath: /home/worker
+          {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -66,3 +71,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.persistence.enabled}}
+      volumes:
+        - name: hcf-coder-storage
+          persistentVolumeClaim:
+            claimName: pvc-hcf-coder
+      {{- end -}}
