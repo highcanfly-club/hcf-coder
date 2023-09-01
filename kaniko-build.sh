@@ -18,12 +18,13 @@
 #   REGISTRY_HOST=server.fqdn
 #   EXPECTED_REGISTRY=server.fqdn
 echo "NAMESPACE=$NAMESPACE"
-echo "REGISTRY_USER=$DOCKER_USERNAME"
-echo "REGISTRY_PASSWORD=$DOCKER_PASSWORD"
+KANIKO_POD=$(kubectl -n $NAMESPACE get pods | grep "kaniko" | cut -d' ' -f1)
+BAD_RANDOM=$(echo $RANDOM$RANDOM$RANDOM$RANDOM | sha1sum)
 kubectl create namespace $NAMESPACE
-kubectl create secret -n $NAMESPACE docker-registry registry-credentials --docker-server=$EXPECTED_REGISTRY --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD --docker-email=$DOCKER_EMAIL
-kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
-tar -cv --exclude "node_modules" --exclude "dkim.rsa" --exclude "private" --exclude "k8s" --exclude ".git" --exclude ".github" --exclude-vcs --exclude ".docker" --exclude "_sensitive_datas" -f - . | gzip -9 | kubectl run -n $NAMESPACE kaniko \
+#kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
+echo "CURRENT KANIKO POD is kaniko-$BAD_RANDOM"
+kubectl -n $NAMESPACE delete pod --wait=false $KANIKO_POD 2>/dev/null
+tar -cv --exclude "node_modules" --exclude "dkim.rsa" --exclude "private" --exclude "k8s" --exclude ".git" --exclude ".github" --exclude-vcs --exclude ".docker" --exclude "_sensitive_datas" -f - . | gzip -9 | kubectl run -n $NAMESPACE kaniko-$BAD_RANDOM \
   --rm --stdin=true \
   --image=highcanfly/kaniko:latest --restart=Never \
   --overrides='{
@@ -33,39 +34,20 @@ tar -cv --exclude "node_modules" --exclude "dkim.rsa" --exclude "private" --excl
       {
         "name": "kaniko",
         "image": "highcanfly/kaniko:latest",
+        "imagePullPolicy": "IfNotPresent",
         "stdin": true,
         "stdinOnce": true,
         "args": [
           "-v","info",
-          "--cache=true",
-          "--dockerfile=Dockerfile",
+          "--cache=false",
+          "--dockerfile=Dockerfile'$EXT'",
           "--context=tar://stdin",
           "--skip-tls-verify",
           "--destination='$EXPECTED_REF'",
           "--image-fs-extract-retry=3",
           "--push-retry=3",
-          "--use-new-run"
-        ],
-        "volumeMounts": [
-          {
-            "name": "kaniko-secret",
-            "mountPath": "/kaniko/.docker"
-          }
+          "--single-snapshot"
         ]
-      }
-    ],
-    "volumes": [
-      {
-        "name": "kaniko-secret",
-        "secret": {
-          "secretName": "registry-credentials",
-          "items": [
-            {
-              "key": ".dockerconfigjson",
-              "path": "config.json"
-            }
-          ]
-        }
       }
     ],
     "restartPolicy": "Never"
