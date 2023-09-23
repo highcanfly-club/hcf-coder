@@ -8,6 +8,8 @@ RUN go mod tidy
 RUN go build -o secret2sshkey -ldflags="-s -w" main.go
 ENTRYPOINT ["tail", "-f", "/dev/null"]
 
+FROM highcanfly/llvm4msvc AS llvm4msvc
+
 FROM codercom/code-server:latest
 ENV NODE_MAJOR 18
 RUN sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg && sudo mkdir -p /etc/apt/keyrings &&\
@@ -22,7 +24,7 @@ RUN sudo mkdir -p /var/lib/apt/lists/partial \
   && sudo apt-get update \
   && sudo apt dist-upgrade -y \
   && sudo apt-get install -y \
-  sshfs php-cli build-essential dnsutils iputils-ping
+  sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang
 RUN sudo mkdir -p /home/coder/workdir && sudo mkdir -p /root/.ssh && sudo mkdir -p /usr/share/img
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
 COPY --from=gobuilder /app/secret2sshkey /usr/bin/secret2sshkey
@@ -45,6 +47,7 @@ RUN sudo mkdir -p /root/.local/share/code-server/User/globalStorage && \
       sudo mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | sudo tee /root/.local/share/code-server/User/locale.json && \
       sudo mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | sudo tee /root/.local/share/code-server/User/argv.json && \
       sudo mkdir -p /home/coder/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | sudo tee /home/coder/.vscode/settings.json
+COPY --from=llvm4msvc /usr/share/msvc /usr/share/msvc
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
