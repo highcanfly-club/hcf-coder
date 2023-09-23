@@ -31,7 +31,6 @@ COPY --from=gobuilder /app/secret2sshkey /usr/bin/secret2sshkey
 COPY scripts/start.sh /usr/bin/start.sh
 RUN sudo chmod ugo+x /usr/bin/start.sh
 COPY hcf.png /usr/share/img/hcf.png
-RUN code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
 RUN code-server --install-extension redhat.vscode-yaml
 RUN code-server --install-extension esbenp.prettier-vscode
 RUN code-server --install-extension golang.Go
@@ -41,6 +40,7 @@ RUN code-server --install-extension franneck94.vscode-typescript-extension-pack
 RUN code-server --install-extension devsense.phptools-vscode
 RUN code-server --install-extension lokalise.i18n-ally
 RUN code-server --install-extension Vue.volar
+# RUN code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
 RUN code-server --install-extension MS-CEINTL.vscode-language-pack-fr
 RUN sudo mv /home/coder/.local /home/coder/.config /root/
 RUN sudo mkdir -p /root/.local/share/code-server/User/globalStorage && \
