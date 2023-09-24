@@ -96,6 +96,9 @@ ENV CC_x86_64_pc_windows_msvc="clang-cl" \
 ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
+RUN apt-get clean autoclean \
+      && apt-get autoremove --yes \
+      && rm -rf /var/lib/{apt,dpkg,cache,log}/
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]

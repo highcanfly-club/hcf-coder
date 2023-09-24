@@ -1,8 +1,8 @@
 Namespace='sandbox-code-server'
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
-default_registry('ttl.sh/sanbox-code-server-17az23')
-Registry='ttl.sh/sanbox-code-server-17az23'
+default_registry('ttl.sh/sanbox-code-server-17az238')
+Registry='ttl.sh/sanbox-code-server-17az238'
 
 os.putenv ( 'DOCKER_REGISTRY' , Registry ) 
 os.putenv('NAMESPACE',Namespace)

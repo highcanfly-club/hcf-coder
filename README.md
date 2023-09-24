@@ -12,10 +12,15 @@ This is how we run it
 - php
 - go
 - rustc
+  - for building for windows x86_64 use 
+    - `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link`
+    - `RUSTFLAGS="-Lnative=/usr/share/msvc/crt/lib/x86_64 -Lnative=/usr/share/msvc/sdk/lib/um/x86_64 -Lnative=/usr/share/msvc/sdk/lib/ucrt/x86_64"`
 - clang/llvm
 - clang-cl / llvm-link: shortcuts $CL $LINK
-  - for targetting MSVC x86 use . /usr/local/bin/msvc-x86.env
-  
+  - for targetting MSVC x86 use `. /usr/local/bin/msvc-x86.env`
+  - for reverting to MSVC x86_64 use `. /usr/local/bin/msvc.env`
+
+
 # Install with helm
 ```
 helm repo add highcanfly https://helm-repo.highcanfly.club/
