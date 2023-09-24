@@ -19,7 +19,7 @@
 #   EXPECTED_REGISTRY=server.fqdn
 echo "NAMESPACE=$NAMESPACE"
 KANIKO_POD=$(kubectl -n $NAMESPACE get pods | grep "kaniko" | cut -d' ' -f1)
-BAD_RANDOM=$(echo $RANDOM$RANDOM$RANDOM$RANDOM | sha1sum)
+BAD_RANDOM=$(echo $RANDOM-$RANDOM-$RANDOM-$RANDOM | openssl dgst -sha1 )
 kubectl create namespace $NAMESPACE
 #kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
 echo "CURRENT KANIKO POD is kaniko-$BAD_RANDOM"
@@ -34,19 +34,20 @@ tar -cv --exclude "node_modules" --exclude "dkim.rsa" --exclude "private" --excl
       {
         "name": "kaniko",
         "image": "highcanfly/kaniko:latest",
-        "imagePullPolicy": "IfNotPresent",
+        "imagePullPolicy": "Always",
         "stdin": true,
         "stdinOnce": true,
         "args": [
           "-v","info",
-          "--cache=false",
           "--dockerfile=Dockerfile'$EXT'",
           "--context=tar://stdin",
           "--skip-tls-verify",
           "--destination='$EXPECTED_REF'",
           "--image-fs-extract-retry=3",
           "--push-retry=3",
-          "--single-snapshot"
+          "--cache=true",
+          "--cache-ttl=24h",
+          "--cache-repo='$DOCKER_REGISTRY-cache'"
         ]
       }
     ],

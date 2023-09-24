@@ -50,6 +50,10 @@ spec:
               privileged: true
               capabilities:
                 add:
+{{ if .Values.DEBUG }}
+          command: ["/bin/sh","-c"]
+          args: ["sleep infinity"]
+{{ end }}
           ports:
           - containerPort: {{ .Values.service.port }}
           {{ if .Values.persistence.enabled}}
