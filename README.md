@@ -8,6 +8,58 @@ This is how we run it
   * ssh-publickey
   * ssh-key-type  
   
+# Tools included
+- php
+- go
+- rustc
+- clang/llvm
+- clang-cl / llvm-link: shortcuts $CL $LINK
+  - for targetting MSVC x86 use . /usr/local/bin/msvc-x86.env
+  
+# Install with helm
+```
+helm repo add highcanfly https://helm-repo.highcanfly.club/
+  helm repo update highcanfly
+  helm install --create-namespace --namespace sandbox-code-server hcf-coder highcanfly/hcf-coder --values values.yaml
+```
+Values containes:
+```yaml
+DEBUG: false
+remoteHost: "1.2.3.4"
+remotePort: "22"
+remotePath: "/a/remote/dir"
+sshPrivatekey: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAaAAAABNlY2RzYS
+    1zaGEyLW5pc3RwMjU2AAAACG5pc3RwMjU2AAAAQQSeaq3MxxVQypn4gx3SnFjURTU3K9O1
+    Ymxsiyqolvl4mmiYBs7w27yyzPKUU3t00uW41b9iOIfTALvCCbKPb2yEAAAAwLGb0z6xm9
+    M+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ5qrczHFVDKmfiD
+    HdKcWNRFNTcr07VibGyLKqiW+XiaaJgGzvDbvLLM8pRTe3TS5bjVv2I4h9MAu8IJso9vbI
+    QAAAAhAIf1qpIpZbDWjemtj6kXfGPwLuCclj4npvobBzwvymmvAAAAIXJsZW1laWxsQEJs
+    aW5nWDcubGVzbXVpZHMud2luZG93cwECAwQFBg==
+    -----END OPENSSH PRIVATE KEY-----
+sshPublickey: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ5qrczHFVDKmfiDHdKcWNRFNTcr07VibGyLKqiW+XiaaJgGzvDbvLLM8pRTe3TS5bjVv2I4h9MAu8IJso9vbIQ= me@myhost.com"
+sshKeyType: ecdsa
+ingress:
+  ingressClassName: haproxy
+  annotations:
+    haproxy.org/auth-type: basic-auth
+    haproxy.org/auth-secret: code-server/vscode-coder-credentials
+  hosts:
+    - host: coder.example.org
+      clusterIssuer: ca-issuer
+users:
+  - user: JDEkakhpTVNCaUIkSWF1SkRoM0FoejhiQXVOLzdoZkVDMAo=
+  # generated with:
+  # openssl passwd -1 24mai2023 | base64
+persistence:
+  enabled: true
+  size: "1Gi"
+  accessModes:
+    - ReadWriteOnce
+```
+
+# Install with kubectl
 For example with a local ssh key:
 ```sh
 kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
