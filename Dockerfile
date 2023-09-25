@@ -22,7 +22,7 @@ ARG TZ=Etc/UTC
 ARG GOVERSION="1.21.1"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang sudo dumb-init\
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init\
       && mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
@@ -55,6 +55,7 @@ RUN chmod ugo+x /usr/bin/start.sh \
       && echo ". /usr/local/go/bin/golang.env" >> /etc/profile \
       && echo ". /usr/local/bin/msvc.env" >> /etc/profile
 COPY hcf.png /usr/share/img/hcf.png
+COPY bin /ext
 # WORKAROUND argon2 binary on ARM64
 RUN cd /usr/lib/code-server \
       && rm -rf node_modules/argon2 \
@@ -63,7 +64,6 @@ RUN cd /usr/lib/code-server \
       && echo -n "password" | npx argon2-cli -d -e
 RUN code-server --install-extension redhat.vscode-yaml \
       && code-server --install-extension esbenp.prettier-vscode \
-      && code-server --install-extension golang.Go \
       && code-server --install-extension rust-lang.rust \
       && code-server --install-extension bierner.markdown-preview-github-styles \
       && code-server --install-extension franneck94.vscode-c-cpp-dev-extension-pack \
@@ -71,8 +71,21 @@ RUN code-server --install-extension redhat.vscode-yaml \
       && code-server --install-extension devsense.phptools-vscode \
       && code-server --install-extension lokalise.i18n-ally \
       && code-server --install-extension Vue.volar \
-      && code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools \
-      && code-server --install-extension MS-CEINTL.vscode-language-pack-fr \
+      && code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
+RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
+            code-server --install-extension ext/ms-vscode.cpptools@linux-x64.vsix; \
+      else \
+            code-server --install-extension ext/ms-vscode.cpptools@linux-arm64.vsix; \
+      fi \
+      && code-server --install-extension ext/yaml.vsix \
+      && code-server --install-extension ext/go.vsix \
+      && code-server --install-extension ext/ms-vscode.vscode-typescript-next.vsix \
+      && code-server --install-extension ext/ms-vscode.cpptools-themes.vsix \
+      && code-server --install-extension ext/ms-vscode.cmake-tools.vsix \
+      && code-server --install-extension ext/vscode-language-pack-fr.vsix \
+      && mkdir -p /root/.local/share/code-server \
+      && cat ext/languagepacks.json > /root/.local/share/code-server/languagepacks.json \
+      && rm -rf ext \
       && mv ${BASEDIR}/.local ${BASEDIR}/.config /root/ || true
 RUN mkdir -p /root/.local/share/code-server/User/globalStorage && \
       mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | tee /root/.local/share/code-server/User/locale.json && \
@@ -80,7 +93,6 @@ RUN mkdir -p /root/.local/share/code-server/User/globalStorage && \
       mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
       && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc \
-      && /root/.cargo/bin/rustup target add i686-pc-windows-msvc \
       && /root/.cargo/bin/rustup target add x86_64-unknown-linux-gnu \
       && /root/.cargo/bin/rustup target add aarch64-unknown-linux-gnu
 RUN ln -svf /usr/bin/clang-14 /usr/bin/clang-cl \
