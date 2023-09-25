@@ -12,6 +12,8 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  strategy:
+    type: {{ .Values.image.updateStrategy }}
   selector:
     matchLabels:
       {{- include "hcf-coder.selectorLabels" . | nindent 6 }}
