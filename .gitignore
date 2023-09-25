@@ -2,3 +2,4 @@ _sensitive_datas/_sensitive_datas.tar.xz
 oauth2.yaml
 test-deployment.yaml
 _values.yaml
+.DS_Store

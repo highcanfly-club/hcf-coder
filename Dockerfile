@@ -82,6 +82,7 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
       && code-server --install-extension ext/ms-vscode.vscode-typescript-next.vsix \
       && code-server --install-extension ext/ms-vscode.cpptools-themes.vsix \
       && code-server --install-extension ext/ms-vscode.cmake-tools.vsix \
+      && code-server --install-extension ext/MS-vsliveshare.vsliveshare.vsix \
       && code-server --install-extension ext/vscode-language-pack-fr.vsix \
       && mkdir -p /root/.local/share/code-server \
       && cat ext/languagepacks.json > /root/.local/share/code-server/languagepacks.json \
