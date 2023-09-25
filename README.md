@@ -24,10 +24,10 @@ This is how we run it
 # Install with helm
 ```
 helm repo add highcanfly https://helm-repo.highcanfly.club/
-  helm repo update highcanfly
-  helm install --create-namespace --namespace sandbox-code-server hcf-coder highcanfly/hcf-coder --values values.yaml
+helm repo update highcanfly
+helm install --create-namespace --namespace sandbox-code-server hcf-coder highcanfly/hcf-coder --values values.yaml
 ```
-Values containes:
+Values contains:
 ```yaml
 DEBUG: false
 remoteHost: "1.2.3.4"
@@ -187,41 +187,4 @@ spec:
   tls:
   - hosts: [coder.example.org]
     secretName: vscode-cert
-```
-
-# Helm chart
-It can be deployed with a basic helm chart.  
-```bash
-helm repo add highcanfly https://helm-repo.highcanfly.club/
-helm repo update
-helm install --namespace sandbox hcf-coder highcanfly/hcf-coder --values _values.yaml
-```
-
-With _values.yaml something like **namespace is hardcoded in ingress.annotations**:
-```yaml
-remoteHost: "192.168.0.1"
-remotePath: "/srv/www"
-sshPrivatekey: |
-    -----BEGIN OPENSSH PRIVATE KEY-----
-    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAaAAAABNlY2RzYS
-    1zaGEyLW5pc3RwMjU2AAAACG5pc3RwMjU2AAAAQQTJ98GpmVJ0xE1KtHciG7SCy5zN+sGz
-    NA2dFznfM/a3XIF0i9GARjmdweyt4zcSWHqkN1DwVzkQ0yqRQWS0dhAZAAAAsEiE6rFIhO
-    qxAAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMn3wamZUnTETUq0
-    dyIbtILLnM36wbM0DZ0XOd8z9rdcgXSL0YBGOZ3B7K3jNxJYeqQ3UPBXORDTKpFBZLR2EB
-    kAAAAhAPpcZtCzORWCy7Ren/yAoURQBtRhiXzvsLCLDmT5OE9bAAAAEXJsZW1laWxsQEdJ
-    R0FUQUJYAQIDBAUG
-    -----END OPENSSH PRIVATE KEY-----
-sshPublickey: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMn3wamZUnTETUq0dyIbtILLnM36wbM0DZ0XOd8z9rdcgXSL0YBGOZ3B7K3jNxJYeqQ3UPBXORDTKpFBZLR2EBk= ronan@example.org"
-sshKeyType: ecdsa
-ingress:
-  ingressClassName: haproxy
-  annotations:
-    haproxy.org/auth-type: basic-auth
-    haproxy.org/auth-secret: sandbox/vscode-coder-credentials
-  hosts:
-    - host: coder.exaple.org
-      clusterIssuer: ca-issuer
-users:
-  - user1: JDEkZGNsN2s3WkYkQ2FCTEhKTmpxYy9INjR3OTlRd3JEMAo= #openssl passwd -1 1septembre2023 | base64
-  - user2: JDEkMVFjR1BIYS8kY0hHSy9KSzlRSWQwT3A3NlV0MU42Lwo= #openssl passwd -1 01septembre2023 | base64
 ```
