@@ -62,26 +62,26 @@ RUN cd /usr/lib/code-server \
       && npm install -g node-gyp \
       && npm install argon2 argon2-cli \
       && echo -n "password" | npx argon2-cli -d -e
-RUN code-server --install-extension redhat.vscode-yaml \
-      && code-server --install-extension esbenp.prettier-vscode \
-      && code-server --install-extension rust-lang.rust \
-      && code-server --install-extension bierner.markdown-preview-github-styles \
-      && code-server --install-extension franneck94.vscode-c-cpp-dev-extension-pack \
-      && code-server --install-extension franneck94.vscode-typescript-extension-pack \
-      && code-server --install-extension devsense.phptools-vscode \
-      && code-server --install-extension lokalise.i18n-ally \
-      && code-server --install-extension Vue.volar \
-      && code-server --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
+# RUN code-server --install-extension redhat.vscode-yaml \
+#       && code-server --install-extension bierner.markdown-preview-github-styles \
+#       && code-server --install-extension lokalise.i18n-ally 
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-            code-server --install-extension ext/ms-vscode.cpptools@linux-x64.vsix; \
+            code-server --install-extension ext/ms-vscode.cpptools@linux-x64.vsix \
+            && code-server --install-extension ext/rust-analyzer-linux-x64.vsix ; \
       else \
-            code-server --install-extension ext/ms-vscode.cpptools@linux-arm64.vsix; \
+            code-server --install-extension ext/ms-vscode.cpptools@linux-arm64.vsix \
+            && code-server --install-extension ext/rust-analyzer-linux-arm64.vsix ; \
       fi \
       && code-server --install-extension ext/yaml.vsix \
       && code-server --install-extension ext/go.vsix \
       && code-server --install-extension ext/ms-vscode.vscode-typescript-next.vsix \
       && code-server --install-extension ext/ms-vscode.cpptools-themes.vsix \
       && code-server --install-extension ext/ms-vscode.cmake-tools.vsix \
+      && code-server --install-extension ext/vscode-kubernetes-tools.vsix \
+      && code-server --install-extension ext/vscode-tailwindcss.vsix \
+      && code-server --install-extension ext/Lokalise.i18n-ally.vsix \
+      && code-server --install-extension ext/markdown-preview-enhanced.vsix \
+      && code-server --install-extension ext/Vue.volar.vsix \
       && code-server --install-extension ext/MS-vsliveshare.vsliveshare.vsix \
       && code-server --install-extension ext/vscode-language-pack-fr.vsix \
       && mkdir -p /root/.local/share/code-server \
