@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 DEBUG: false
+dockersock: ""
 remoteHost: "192.0.0.1"
 remotePort: "22"
 remotePath: "/home/coder"
