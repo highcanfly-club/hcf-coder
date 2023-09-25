@@ -42,7 +42,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           cache-from: type=registry,ref=${{ secrets.DOCKER_BUILDX_CACHE }}
-          cache-to: type=registry,ref={{ secrets.DOCKER_BUILDX_CACHE }},mode=max
+          cache-to: type=registry,ref=${{ secrets.DOCKER_BUILDX_CACHE }},mode=max
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
