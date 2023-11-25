@@ -19,7 +19,7 @@ USER 0
 ARG NODE_MAJOR="18"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.21.1"
+ARG GOVERSION="1.21.4"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init\
@@ -112,6 +112,7 @@ ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 RUN apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
