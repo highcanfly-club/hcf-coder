@@ -1,15 +1,10 @@
 FROM bitnami/oauth2-proxy:7-debian-11 as oauth2
 
-FROM golang:1.21-alpine  as gobuilder
-WORKDIR /app
-COPY secret2sshkey/* ./
-RUN go mod tidy
-RUN go build -o secret2sshkey -ldflags="-s -w" main.go
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+FROM highcanfly/secret2sshkey:latest  as secret2sshkey
 
-FROM highcanfly/llvm4msvc AS llvm4msvc
+FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
-FROM highcanfly/llvm4msvc-x86 AS llvm4msvc-x86
+FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
 FROM codercom/code-server:latest as coder
 
@@ -43,7 +38,7 @@ RUN mkdir -p ${BASEDIR}/workdir \
       && mkdir -p /usr/share/img \
       && npm install -g node-gyp argon2
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
-COPY --from=gobuilder /app/secret2sshkey /usr/bin/secret2sshkey
+COPY --from=secret2sshkey /app/secret2sshkey /usr/bin/secret2sshkey
 COPY scripts/start.sh /usr/bin/start.sh
 COPY scripts/golang.env /usr/local/go/bin/golang.env
 COPY scripts/msvc.env /usr/local/bin/msvc.env
