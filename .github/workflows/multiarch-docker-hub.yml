@@ -9,8 +9,8 @@
 
 name: Build on Github and Publish amd64/arm64 to docker Hub
 on:
-  release:
-    types: [published]
+#  release:
+#    types: [published]
   workflow_dispatch:
 jobs:
   push_to_registry:
