@@ -35,14 +35,14 @@ RUN mkdir -p ${BASEDIR}/workdir \
       && mkdir -p {BASEDIR}/.local \
       && mkdir -p {BASEDIR}/.config \  
       && mkdir -p /root/.ssh \
-      && mkdir -p /usr/share/img \
-      && npm install -g node-gyp argon2
+      && mkdir -p /usr/share/img 
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
 COPY --from=secret2sshkey /app/secret2sshkey /usr/bin/secret2sshkey
 COPY scripts/start.sh /usr/bin/start.sh
 COPY scripts/golang.env /usr/local/go/bin/golang.env
 COPY scripts/msvc.env /usr/local/bin/msvc.env
 COPY scripts/msvc-x86.env /usr/local/bin/msvc-x86.env
+COPY scripts/getKubeConfig /usr/local/bin/getKubeConfig
 RUN chmod ugo+x /usr/bin/start.sh \
       && chmod ugo+x /usr/local/go/bin/golang.env \
       && chmod ugo+x /usr/local/bin/msvc.env \
@@ -50,16 +50,7 @@ RUN chmod ugo+x /usr/bin/start.sh \
       && echo ". /usr/local/go/bin/golang.env" >> /etc/profile \
       && echo ". /usr/local/bin/msvc.env" >> /etc/profile
 COPY hcf.png /usr/share/img/hcf.png
-COPY bin /ext
-# WORKAROUND argon2 binary on ARM64
-RUN cd /usr/lib/code-server \
-      && rm -rf node_modules/argon2 \
-      && npm install -g node-gyp \
-      && npm install argon2 argon2-cli \
-      && echo -n "password" | npx argon2-cli -d -e
-# RUN code-server --install-extension redhat.vscode-yaml \
-#       && code-server --install-extension bierner.markdown-preview-github-styles \
-#       && code-server --install-extension lokalise.i18n-ally 
+COPY bin /ext 
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             code-server --install-extension ext/ms-vscode.cpptools@linux-x64.vsix \
             && code-server --install-extension ext/rust-analyzer-linux-x64.vsix ; \

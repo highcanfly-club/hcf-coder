@@ -45,6 +45,11 @@ sshPrivatekey: |
     -----END OPENSSH PRIVATE KEY-----
 sshPublickey: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ5qrczHFVDKmfiDHdKcWNRFNTcr07VibGyLKqiW+XiaaJgGzvDbvLLM8pRTe3TS5bjVv2I4h9MAu8IJso9vbIQ= me@myhost.com"
 sshKeyType: ecdsa
+# if needed for retrieving two kubeconfig for using getKubeConfig
+# any executable thing for generating (even empty) .kube.config to stdout
+# example:
+# getKubeconfigONE: 'scp user@some-server:/home/user/.kube/config /dev/stdout'
+# getKubeconfigTWO: 'curl https://user:password@some-server/kube.config'
 ingress:
   ingressClassName: haproxy
   annotations:

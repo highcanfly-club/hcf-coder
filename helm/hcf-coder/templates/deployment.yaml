@@ -48,6 +48,16 @@ spec:
             value: {{ .Values.remotePath | quote }}
           - name: APPNAME
             value: {{ .Values.publicName | quote }}
+          - name: GET_KUBECONFIG_ONE
+            valueFrom:
+            secretKeyRef:
+              key: get-kubeconfig-one
+              name: get-kubeconfig
+          - name: GET_KUBECONFIG_TWO
+            valueFrom:
+            secretKeyRef:
+              key: get-kubeconfig-two
+              name: get-kubeconfig
           securityContext:
               privileged: true
               capabilities:
