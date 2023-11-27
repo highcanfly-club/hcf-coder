@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cl
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
       && apt-get update \
       && apt-get install nodejs -y
-RUN curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-$(dpkg --print-architecture).tar.gz | tar -xvz && mv go /usr/local/ \
+RUN curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-$(dpkg --print-architecture).tar.gz | tar -xz && mv go /usr/local/ \
       && sed -ibak 's/:\/usr\/bin:/:\/usr\/bin:\/usr\/local\/go\/bin:/g' /etc/profile \
       && curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash - \ 
       && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" \
@@ -78,6 +78,7 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
       && code-server --install-extension ext/markdown-preview-enhanced.vsix \
       && code-server --install-extension ext/Vue.volar.vsix \
       && code-server --install-extension ext/MS-vsliveshare.vsliveshare.vsix \
+      && code-server --install-extension ext/ms-python.python.vsix \
       && code-server --install-extension ext/vscode-language-pack-fr.vsix \
       && mkdir -p /root/.local/share/code-server \
       && cat ext/languagepacks.json > /root/.local/share/code-server/languagepacks.json \
@@ -104,6 +105,7 @@ ENV CC_x86_64_pc_windows_msvc="clang-cl" \
 ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
+RUN   curl https://get.okteto.com -sSfL | sh
 RUN apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
