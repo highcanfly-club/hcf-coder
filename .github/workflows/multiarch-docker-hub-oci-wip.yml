@@ -48,5 +48,5 @@ jobs:
           # cache-from: type=registry,ref=${{ secrets.DOCKER_BUILDX_CACHE }}
           # cache-to: type=registry,ref=${{ secrets.DOCKER_BUILDX_CACHE }},mode=max
           push: true
-          tags: ${{ steps.meta.outputs.tags }}-oci-test
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
