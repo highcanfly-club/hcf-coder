@@ -17,7 +17,7 @@ ARG TZ=Etc/UTC
 ARG GOVERSION="1.21.4"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init\
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip\
       && mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
@@ -97,7 +97,7 @@ ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 RUN   curl https://get.okteto.com -sSfL | sh
-RUN apt-get clean autoclean \
+RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
 RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
