@@ -2,6 +2,7 @@
 # © Ronan LE MEILLAT 2023
 # released under the GPLv3 terms
 #########################################################################
+{{ if not .Values.minimal }}
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -24,3 +25,4 @@ roleRef:
   kind: Role #this must be Role or ClusterRole
   name: secret-reader 
   apiGroup: rbac.authorization.k8s.io
+{{ end }}

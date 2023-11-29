@@ -58,10 +58,12 @@ spec:
               secretKeyRef:
                 key: get-kubeconfig-two
                 name: get-kubeconfig
+          {{- if not .Values.minimal }}
           securityContext:
               privileged: true
               capabilities:
                 add:
+          {{- end }}
 {{ if .Values.DEBUG }}
           command: ["/bin/sh","-c"]
           args: ["sleep infinity"]

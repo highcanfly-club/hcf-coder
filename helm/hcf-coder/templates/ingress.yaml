@@ -2,6 +2,7 @@
 # © Ronan LE MEILLAT 2023
 # released under the GPLv3 terms
 #########################################################################
+{{ if .Values.ingress.enabled }}
 {{- range .Values.ingress.hosts }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -10,12 +11,13 @@ metadata:
   annotations:
       {{- toYaml . | nindent 6 }}
   {{- end }}
-      cert-manager.io/cluster-issuer: {{ .clusterIssuer }}
   labels:
     chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
   name: {{ print "hcf-coder-ingress-" .host  | replace "." "-" }}
 spec:
+  {{ if $.Values.ingress.ingressClassName }}
   ingressClassName: {{ $.Values.ingress.ingressClassName }}
+  {{ end }}
   rules:
     - host: {{.host }}
       http:
@@ -27,10 +29,13 @@ spec:
                   number: {{ $.Values.service.port }}
             path: /
             pathType: Prefix
+  {{ if .tls }}
   tls:
     - hosts:
         - {{ .host }}
       secretName: {{ print "hcf-coder-cert-" .host  | replace "." "-" }}
+  {{ end }}
 ---
 
 {{- end }}
+{{ end }}

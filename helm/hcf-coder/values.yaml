@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 DEBUG: false
+minimal: false
 dockersock: ""
 remoteHost: "192.0.0.1"
 remotePort: "22"
@@ -60,11 +61,11 @@ service:
   port: 8080
 
 ingress:
+  enabled: true
   className: nginx
   annotations: {}
   hosts:
   - host: chart-example.local
-    clusterIssuer: letsencrypt-issuer
 
 
 resources: {}
@@ -91,3 +92,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+oauth2-proxy:
+  enabled: false
