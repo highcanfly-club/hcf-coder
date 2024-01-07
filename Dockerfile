@@ -28,6 +28,10 @@ RUN curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-$(dpkg --print-architectur
       && curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash - \ 
       && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" \
       && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg \
+      && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" | tee /etc/apt/sources.list.d/docker.list \
+      && apt-get update \
+      && apt-get install -y docker-ce docker-ce-cli containerd.io
 COPY --from=coder /usr/lib/code-server /usr/lib/code-server
 COPY --from=coder /usr/bin/code-server /usr/bin/code-server
 COPY --from=coder /usr/bin/entrypoint.sh /usr/bin/entrypoint.sh
@@ -97,10 +101,13 @@ ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 RUN   curl https://get.okteto.com -sSfL | sh
+RUN go install -v golang.org/x/tools/gopls@latest
 RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
 RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
+RUN git config --global user.email "hcf@coder" \
+      && git config --global user.name "hcf coder"
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
