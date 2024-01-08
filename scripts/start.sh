@@ -16,4 +16,14 @@ if [ ! -f ${BASEDIR}/.vscode/settings.json ]
 then
     mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
 fi
+
+DIRS=".local .cargo .bash_history .bashrc .profile .gitconfig .config .rustup .go"
+for DIR in $DIRS ; do
+    if [ ! -d "${BASEDIR}/${DIR}" ] ; then
+        echo "Persisting ${BASEDIR}/${DIR}"
+        mkdir -p ${BASEDIR}/${DIR}
+        cp -av /vscode/${DIR}/* ${BASEDIR}/${DIR}/ || true
+    fi
+done
+
 /usr/bin/entrypoint.sh --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 --app-name \"$APPNAME\" .

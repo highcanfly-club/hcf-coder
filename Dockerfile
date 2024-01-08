@@ -109,6 +109,16 @@ RUN apt dist-upgrade -y && apt-get clean autoclean \
 RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
 RUN git config --global user.email "hcf@coder" \
       && git config --global user.name "hcf coder"
+RUN mkdir -p /vscode \
+      && mv ${BASEDIR}/.local /vscode/ || true \
+      && mv ${BASEDIR}/.cargo /vscode/ || true \
+      && mv ${BASEDIR}/.bash_history /vscode/ || true \
+      && mv ${BASEDIR}/.bashrc /vscode/ || true \
+      && mv ${BASEDIR}/.profile /vscode/ || true \
+      && mv ${BASEDIR}/.gitconfig /vscode/ || true \
+      && mv ${BASEDIR}/.config /vscode/ || true \
+      && mv ${BASEDIR}/.rustup /vscode/ || true \
+      && mv ${BASEDIR}/.go /vscode/ || true \
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
