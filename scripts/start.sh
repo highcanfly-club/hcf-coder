@@ -17,12 +17,11 @@ then
     mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
 fi
 
-DIRS=".local .cargo .bash_history .bashrc .profile .gitconfig .config .rustup .go"
-for DIR in $DIRS ; do
-    if [ ! -d "${BASEDIR}/${DIR}" ] ; then
-        echo "Persisting ${BASEDIR}/${DIR}"
-        mkdir -p ${BASEDIR}/${DIR}
-        cp -av /vscode/${DIR}/* ${BASEDIR}/${DIR}/ || true
+LINKS=".local .cargo .bash_history .bashrc .profile .gitconfig .config .rustup go"
+for LINK in $LINKS ; do
+    if [ ! -e "${BASEDIR}/${LINK}" ] ; then
+        echo "Linking ${BASEDIR}/${LINK}"
+        ln -svf /vscode/${LINK} ${BASEDIR}/${LINK} || true
     fi
 done
 

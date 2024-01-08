@@ -18,7 +18,8 @@ ARG GOVERSION="1.21.5"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
-RUN usermod --home ${BASEDIR} root
+WORKDIR ${BASEDIR}
+RUN mkdir -p ${BASEDIR} && sed -ibak 's/:\/root:/:\/home\/coder:/g' /etc/passwd 
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip\
       && mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -38,8 +39,8 @@ COPY --from=coder /usr/lib/code-server /usr/lib/code-server
 COPY --from=coder /usr/bin/code-server /usr/bin/code-server
 COPY --from=coder /usr/bin/entrypoint.sh /usr/bin/entrypoint.sh
 RUN mkdir -p ${BASEDIR}/workdir \
-      && mkdir -p {BASEDIR}/.local \
-      && mkdir -p {BASEDIR}/.config \  
+      && mkdir -p ${BASEDIR}/.local \
+      && mkdir -p ${BASEDIR}/.config \  
       && mkdir -p ${BASEDIR}/.ssh \
       && mkdir -p /usr/share/img 
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
@@ -58,36 +59,36 @@ RUN chmod ugo+x /usr/bin/start.sh \
 COPY hcf.png /usr/share/img/hcf.png
 COPY bin /ext 
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-            code-server --install-extension ext/ms-vscode.cpptools@linux-x64.vsix \
-            && code-server --install-extension ext/rust-analyzer-linux-x64.vsix ; \
+            code-server --install-extension /ext/ms-vscode.cpptools@linux-x64.vsix \
+            && code-server --install-extension /ext/rust-analyzer-linux-x64.vsix ; \
       else \
-            code-server --install-extension ext/ms-vscode.cpptools@linux-arm64.vsix \
-            && code-server --install-extension ext/rust-analyzer-linux-arm64.vsix ; \
+            code-server --install-extension /ext/ms-vscode.cpptools@linux-arm64.vsix \
+            && code-server --install-extension /ext/rust-analyzer-linux-arm64.vsix ; \
       fi \
-      && code-server --install-extension ext/yaml.vsix \
-      && code-server --install-extension ext/go.vsix \
-      && code-server --install-extension ext/ms-vscode.vscode-typescript-next.vsix \
-      && code-server --install-extension ext/ms-vscode.cpptools-themes.vsix \
-      && code-server --install-extension ext/ms-vscode.cmake-tools.vsix \
-      && code-server --install-extension ext/vscode-kubernetes-tools.vsix \
-      && code-server --install-extension ext/vscode-tailwindcss.vsix \
-      && code-server --install-extension ext/Lokalise.i18n-ally.vsix \
-      && code-server --install-extension ext/markdown-preview-enhanced.vsix \
-      && code-server --install-extension ext/Vue.volar.vsix \
-      && code-server --install-extension ext/MS-vsliveshare.vsliveshare.vsix \
-      && code-server --install-extension ext/ms-python.python.vsix \
-      && code-server --install-extension ext/vscode-language-pack-fr.vsix \
+      && code-server --install-extension /ext/yaml.vsix \
+      && code-server --install-extension /ext/go.vsix \
+      && code-server --install-extension /ext/ms-vscode.vscode-typescript-next.vsix \
+      && code-server --install-extension /ext/ms-vscode.cpptools-themes.vsix \
+      && code-server --install-extension /ext/ms-vscode.cmake-tools.vsix \
+      && code-server --install-extension /ext/vscode-kubernetes-tools.vsix \
+      && code-server --install-extension /ext/vscode-tailwindcss.vsix \
+      && code-server --install-extension /ext/Lokalise.i18n-ally.vsix \
+      && code-server --install-extension /ext/markdown-preview-enhanced.vsix \
+      && code-server --install-extension /ext/Vue.volar.vsix \
+      && code-server --install-extension /ext/MS-vsliveshare.vsliveshare.vsix \
+      && code-server --install-extension /ext/ms-python.python.vsix \
+      && code-server --install-extension /ext/vscode-language-pack-fr.vsix \
       && mkdir -p  ${BASEDIR}/.local/share/code-server \
-      && cat ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
-      && rm -rf ext 
+      && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
+      && rm -rf /ext 
 RUN mkdir -p  ${BASEDIR}/.local/share/code-server/User/globalStorage && \
       mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/locale.json && \
       mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/argv.json && \
       mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
-      && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc \
-      && /root/.cargo/bin/rustup target add x86_64-unknown-linux-gnu \
-      && /root/.cargo/bin/rustup target add aarch64-unknown-linux-gnu
+      && ${BASEDIR}/.cargo/bin/rustup target add x86_64-pc-windows-msvc \
+      && ${BASEDIR}/.cargo/bin/rustup target add x86_64-unknown-linux-gnu \
+      && ${BASEDIR}/.cargo/bin/rustup target add aarch64-unknown-linux-gnu
 RUN ln -svf /usr/bin/clang-14 /usr/bin/clang-cl \
       && ln -svf /usr/bin/ld.lld-14 /usr/bin/lld-link
 COPY --from=llvm4msvc-x86 /usr/share/msvc /usr/share/msvc
@@ -109,16 +110,16 @@ RUN apt dist-upgrade -y && apt-get clean autoclean \
 RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
 RUN git config --global user.email "hcf@coder" \
       && git config --global user.name "hcf coder"
-RUN mkdir -p /vscode \
-      && mv ${BASEDIR}/.local /vscode/ || true \
-      && mv ${BASEDIR}/.cargo /vscode/ || true \
-      && mv ${BASEDIR}/.bash_history /vscode/ || true \
-      && mv ${BASEDIR}/.bashrc /vscode/ || true \
-      && mv ${BASEDIR}/.profile /vscode/ || true \
-      && mv ${BASEDIR}/.gitconfig /vscode/ || true \
-      && mv ${BASEDIR}/.config /vscode/ || true \
-      && mv ${BASEDIR}/.rustup /vscode/ || true \
-      && mv ${BASEDIR}/.go /vscode/ || true \
+RUN mkdir -p /vscode 
+RUN mv ${BASEDIR}/.local /vscode/  
+RUN mv ${BASEDIR}/.cargo /vscode/  
+RUN rm -f ${BASEDIR}/.bash_history
+RUN rm -f ${BASEDIR}/.bashrc 
+RUN mv ${BASEDIR}/.profile /vscode/  
+RUN mv ${BASEDIR}/.gitconfig /vscode/ 
+RUN mv ${BASEDIR}/.config /vscode/  
+RUN mv ${BASEDIR}/.rustup /vscode/ 
+RUN mv ${BASEDIR}/go /vscode/ 
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
