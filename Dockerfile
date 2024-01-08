@@ -11,12 +11,14 @@ FROM codercom/code-server:latest as coder
 FROM ubuntu:latest
 
 USER 0
-ARG NODE_MAJOR="18"
+ARG NODE_MAJOR="20"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.21.4"
+ARG GOVERSION="1.21.5"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
+ENV HOME=$BASEDIR
+RUN usermod --home ${BASEDIR} root
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip\
       && mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -38,7 +40,7 @@ COPY --from=coder /usr/bin/entrypoint.sh /usr/bin/entrypoint.sh
 RUN mkdir -p ${BASEDIR}/workdir \
       && mkdir -p {BASEDIR}/.local \
       && mkdir -p {BASEDIR}/.config \  
-      && mkdir -p /root/.ssh \
+      && mkdir -p ${BASEDIR}/.ssh \
       && mkdir -p /usr/share/img 
 COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
 COPY --from=secret2sshkey /app/secret2sshkey /usr/bin/secret2sshkey
@@ -75,13 +77,12 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
       && code-server --install-extension ext/MS-vsliveshare.vsliveshare.vsix \
       && code-server --install-extension ext/ms-python.python.vsix \
       && code-server --install-extension ext/vscode-language-pack-fr.vsix \
-      && mkdir -p /root/.local/share/code-server \
-      && cat ext/languagepacks.json > /root/.local/share/code-server/languagepacks.json \
-      && rm -rf ext \
-      && mv ${BASEDIR}/.local ${BASEDIR}/.config /root/ || true
-RUN mkdir -p /root/.local/share/code-server/User/globalStorage && \
-      mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | tee /root/.local/share/code-server/User/locale.json && \
-      mkdir -p /root/.local/share/code-server/User && echo '{"locale":"fr"}' | tee /root/.local/share/code-server/User/argv.json && \
+      && mkdir -p  ${BASEDIR}/.local/share/code-server \
+      && cat ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
+      && rm -rf ext 
+RUN mkdir -p  ${BASEDIR}/.local/share/code-server/User/globalStorage && \
+      mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/locale.json && \
+      mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/argv.json && \
       mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
       && /root/.cargo/bin/rustup target add x86_64-pc-windows-msvc \
@@ -101,7 +102,7 @@ ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 RUN   curl https://get.okteto.com -sSfL | sh
-# RUN /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest
+# RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest'
 RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
