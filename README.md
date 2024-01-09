@@ -193,3 +193,9 @@ spec:
   - hosts: [coder.example.org]
     secretName: vscode-cert
 ```
+# Using with Docker
+Simply hit: 
+```sh
+docker run -p 8080:8080 highcanfly/code-server:latest
+```
+And browse http://localhost:8080 from your browser

@@ -73,7 +73,7 @@ spec:
           {{ if .Values.persistence.enabled}}
           volumeMounts:
             - name: hcf-coder-storage
-              mountPath: /home/worker
+              mountPath: /home/coder
             {{ if .Values.dockersock }}
             - name: dockersock
               mountPath: /var/run/docker.sock
