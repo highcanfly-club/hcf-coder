@@ -104,6 +104,7 @@ ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 RUN   curl https://get.okteto.com -sSfL | sh
 RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest'
+RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go get github.com/go-delve/delve/cmd/dlv'
 RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
