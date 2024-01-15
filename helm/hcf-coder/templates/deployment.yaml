@@ -70,6 +70,14 @@ spec:
 {{ end }}
           ports:
           - containerPort: {{ .Values.service.port }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 300 # 5 minutes because it takes time to download the image wich is 2.5GB
+          periodSeconds: 20
+          {{- end }}
           {{ if .Values.persistence.enabled}}
           volumeMounts:
             - name: hcf-coder-storage
