@@ -199,3 +199,6 @@ Simply hit:
 docker run -p 8080:8080 highcanfly/code-server:latest
 ```
 And browse http://localhost:8080 from your browser
+
+# Building manually
+`docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:1.5.12 --tag highcanfly/code-server:latest  .`
