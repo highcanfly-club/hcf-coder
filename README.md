@@ -11,6 +11,8 @@ This is how we run it
 # Tools included
 - php
 - go
+- Github Copilot and Copilot-chat
+  - note for upgrading copilot chat you need to edit its package.json for allowing current code version (ie replacing ^1.85 by >=1.85 for example)
 - rustc
   - for building for windows x86_64 use 
     - `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link`
