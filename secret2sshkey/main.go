@@ -1,4 +1,4 @@
-// Copyright 2023 Ronan Le Meillat.
+// Copyright 2023-2024 Ronan Le Meillat.
 // secret2sshkey is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -18,12 +18,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+)
+
+const (
+	SSHPrivateKeyKey = "ssh-privatekey"
+	SSHPublicKeyKey  = "ssh-publickey"
+	SSHKeyTypeKey    = "ssh-key-type"
 )
 
 // create secret with
@@ -31,21 +38,27 @@ import (
 // or
 // kubectl create secret generic ssh-key-secret --from-file=ssh-privatekey=/Users/rlemeill/.ssh/id_ecdsa --from-file=ssh-publickey=/Users/rlemeill/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
 
-func getCurrentContext() string {
-	content, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+func getCurrentContext() (string, error) {
+	content, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
-		return "default"
+		return "default", err
 	}
-	return string(content)
+	return string(content), nil
 }
 
 func save(content string, file string) error {
 	f, err := os.Create(file)
-	if err == nil {
-		f.WriteString(content)
-		f.Close()
+	if err != nil {
+		return err
 	}
-	return err
+	defer f.Close()
+
+	_, err = f.WriteString(content)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {
@@ -58,22 +71,25 @@ func main() {
 	flag.Parse()
 
 	// Usage Demo
-	if *help {
+	if *help || SSH_DIR == "" || secretName == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
-	currentNamespace := getCurrentContext()
 
+	currentNamespace, err := getCurrentContext()
+	if err != nil {
+		log.Fatalf("Failed to get current context: %v", err)
+	}
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		panic(err.Error())
+		log.Panicf("Failed to get in-cluster config: %v", err)
 	}
 
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		log.Panicf("Failed to get clientset: %v", err)
 	}
 
 	context := context.TODO()
@@ -81,29 +97,47 @@ func main() {
 	secret, err := clientset.CoreV1().Secrets(currentNamespace).Get(
 		context, secretName, metav1.GetOptions{})
 	if err != nil {
-		panic(err.Error())
+		log.Panicf("Failed to get secret: %v", err)
 	}
 
-	sshPrivateKey := string(secret.Data["ssh-privatekey"])
-	sshPublicKey := string(secret.Data["ssh-publickey"])
-	sshKeyType := string(secret.Data["ssh-key-type"])
+	if secret == nil {
+		log.Panicf("Secret %s not found in namespace %s", secretName, currentNamespace)
+	}
 
-	// fmt.Println(sshKeyType)
-	// fmt.Println(sshPrivateKey)
-	// fmt.Println(sshPublicKey)
+	if secret.Data[SSHPrivateKeyKey] == nil {
+		log.Panicf("Secret %s does not contain %s", secretName, SSHPrivateKeyKey)
+	}
 
-	sshPrivateKeyFile := fmt.Sprintf("%s/id_%s", SSH_DIR, sshKeyType)
-	sshPublicKeyFile := fmt.Sprintf("%s/id_%s.pub", SSH_DIR, sshKeyType)
+	if secret.Data[SSHPublicKeyKey] == nil {
+		log.Panicf("Secret %s does not contain %s", secretName, SSHPublicKeyKey)
+	}
+
+	if secret.Data[SSHKeyTypeKey] == nil {
+		log.Panicf("Secret %s does not contain %s", secretName, SSHKeyTypeKey)
+	}
+
+	sshPrivateKey := string(secret.Data[SSHPrivateKeyKey])
+	sshPublicKey := string(secret.Data[SSHPublicKeyKey])
+	sshKeyType := string(secret.Data[SSHKeyTypeKey])
+
+	sshPrivateKeyFile := filepath.Join(SSH_DIR, fmt.Sprintf("id_%s", sshKeyType))
+	sshPublicKeyFile := filepath.Join(SSH_DIR, fmt.Sprintf("id_%s.pub", sshKeyType))
 
 	// save key
 	err = save(sshPrivateKey, sshPrivateKeyFile)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to save privateKey: %v", err)
 	}
 
 	err = save(sshPublicKey, sshPublicKeyFile)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to save publicKey: %v", err)
 	}
-	fmt.Printf("secret2sshkey sshKeyType=%s sshPrivateKeyFile=%s sshPublicKeyFile=%s\n", sshKeyType, sshPrivateKeyFile, sshPublicKeyFile)
+
+	err = os.Chmod(sshPrivateKeyFile, 0600)
+	if err != nil {
+		log.Fatalf("Failed to set permissions on privateKey file: %v", err)
+	}
+
+	log.Printf("secret2sshkey sshKeyType=%s sshPrivateKeyFile=%s sshPublicKeyFile=%s\n", sshKeyType, sshPrivateKeyFile, sshPublicKeyFile)
 }
