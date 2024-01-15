@@ -20,7 +20,7 @@ ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
 WORKDIR ${BASEDIR}
 RUN mkdir -p ${BASEDIR} && sed -ibak 's/:\/root:/:\/home\/coder:/g' /etc/passwd 
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip\
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip zip unzip\
       && mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
