@@ -79,6 +79,7 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
       && code-server --install-extension /ext/ms-python.python.vsix \
       && code-server --install-extension /ext/vscode-language-pack-fr.vsix \
       && code-server --install-extension /ext/GitHub.copilot.vsix \
+      && code-server --install-extension /ext/GitHub.copilot-chat.vsix \
       && mkdir -p  ${BASEDIR}/.local/share/code-server \
       && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
       && rm -rf /ext 
