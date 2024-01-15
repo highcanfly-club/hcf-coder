@@ -74,8 +74,8 @@ func isPEMPrivateKey(key string) (bool, error) {
 	return true, nil
 }
 
-// getCurrentContext returns the current namespace
-func getCurrentContext() (string, error) {
+// getCurrentNamespace returns the current namespace
+func getCurrentNamespace() (string, error) {
 	content, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		return "default", err
@@ -118,7 +118,7 @@ func main() {
 	}
 
 	// get current namespace
-	currentNamespace, err := getCurrentContext()
+	currentNamespace, err := getCurrentNamespace()
 	if err != nil {
 		log.Fatalf("Failed to get current context: %v", err)
 	}
