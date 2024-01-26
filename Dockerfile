@@ -59,29 +59,18 @@ RUN chmod ugo+x /usr/bin/start.sh \
 COPY hcf.png /usr/share/img/hcf.png
 COPY bin /ext 
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-            code-server --install-extension /ext/ms-vscode.cpptools@linux-x64.vsix \
-            && code-server --install-extension /ext/rust-analyzer-linux-x64.vsix ; \
+            for file in /ext/amd64/*.vsix; do \
+                code-server --install-extension $file; \
+            done; \
       else \
-            code-server --install-extension /ext/ms-vscode.cpptools@linux-arm64.vsix \
-            && code-server --install-extension /ext/rust-analyzer-linux-arm64.vsix ; \
-      fi \
-      && code-server --install-extension /ext/foxundermoon.shell-format.vsix  \
-      && code-server --install-extension /ext/GitHub.copilot-chat.vsix \
-      && code-server --install-extension /ext/GitHub.copilot.vsix \
-      && code-server --install-extension /ext/go.vsix \
-      && code-server --install-extension /ext/Lokalise.i18n-ally.vsix \
-      && code-server --install-extension /ext/markdown-preview-enhanced.vsix \
-      && code-server --install-extension /ext/ms-python.python.vsix \
-      && code-server --install-extension /ext/ms-vscode.cmake-tools.vsix \
-      && code-server --install-extension /ext/ms-vscode.cpptools-themes.vsix \
-      && code-server --install-extension /ext/ms-vscode.vscode-typescript-next.vsix \
-      && code-server --install-extension /ext/MS-vsliveshare.vsliveshare.vsix \
-      && code-server --install-extension /ext/vscode-kubernetes-tools.vsix \
-      && code-server --install-extension /ext/vscode-language-pack-fr.vsix \
-      && code-server --install-extension /ext/vscode-tailwindcss.vsix \
-      && code-server --install-extension /ext/Vue.volar.vsix \
-      && code-server --install-extension /ext/yaml.vsix \
-      && mkdir -p  ${BASEDIR}/.local/share/code-server \
+            for file in /ext/arm64/*.vsix; do \
+                code-server --install-extension $file; \
+            done; \
+      fi
+RUN for FILE in /ext/*.vsix; do \
+        code-server --install-extension $FILE; \
+    done
+RUN mkdir -p  ${BASEDIR}/.local/share/code-server \
       && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
       && rm -rf /ext 
 RUN mkdir -p  ${BASEDIR}/.local/share/code-server/User/globalStorage && \
@@ -105,7 +94,7 @@ ENV CC_x86_64_pc_windows_msvc="clang-cl" \
 ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
     CXXFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS"
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
-RUN   curl https://get.okteto.com -sSfL | sh
+# RUN   curl https://get.okteto.com -sSfL | sh
 RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest'
 RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v github.com/go-delve/delve/cmd/dlv@latest'
 RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/go install -v honnef.co/go/tools/cmd/staticcheck@latest'
