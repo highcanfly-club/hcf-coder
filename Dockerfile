@@ -65,21 +65,22 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             code-server --install-extension /ext/ms-vscode.cpptools@linux-arm64.vsix \
             && code-server --install-extension /ext/rust-analyzer-linux-arm64.vsix ; \
       fi \
-      && code-server --install-extension /ext/yaml.vsix \
+      && code-server --install-extension /ext/foxundermoon.shell-format.vsix  \
+      && code-server --install-extension /ext/GitHub.copilot-chat.vsix \
+      && code-server --install-extension /ext/GitHub.copilot.vsix \
       && code-server --install-extension /ext/go.vsix \
-      && code-server --install-extension /ext/ms-vscode.vscode-typescript-next.vsix \
-      && code-server --install-extension /ext/ms-vscode.cpptools-themes.vsix \
-      && code-server --install-extension /ext/ms-vscode.cmake-tools.vsix \
-      && code-server --install-extension /ext/vscode-kubernetes-tools.vsix \
-      && code-server --install-extension /ext/vscode-tailwindcss.vsix \
       && code-server --install-extension /ext/Lokalise.i18n-ally.vsix \
       && code-server --install-extension /ext/markdown-preview-enhanced.vsix \
-      && code-server --install-extension /ext/Vue.volar.vsix \
-      && code-server --install-extension /ext/MS-vsliveshare.vsliveshare.vsix \
       && code-server --install-extension /ext/ms-python.python.vsix \
+      && code-server --install-extension /ext/ms-vscode.cmake-tools.vsix \
+      && code-server --install-extension /ext/ms-vscode.cpptools-themes.vsix \
+      && code-server --install-extension /ext/ms-vscode.vscode-typescript-next.vsix \
+      && code-server --install-extension /ext/MS-vsliveshare.vsliveshare.vsix \
+      && code-server --install-extension /ext/vscode-kubernetes-tools.vsix \
       && code-server --install-extension /ext/vscode-language-pack-fr.vsix \
-      && code-server --install-extension /ext/GitHub.copilot.vsix \
-      && code-server --install-extension /ext/GitHub.copilot-chat.vsix \
+      && code-server --install-extension /ext/vscode-tailwindcss.vsix \
+      && code-server --install-extension /ext/Vue.volar.vsix \
+      && code-server --install-extension /ext/yaml.vsix \
       && mkdir -p  ${BASEDIR}/.local/share/code-server \
       && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
       && rm -rf /ext 
