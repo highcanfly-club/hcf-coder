@@ -61,6 +61,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 8080
+  auxiliaryPort: 8888
 
 ingress:
   enabled: true
