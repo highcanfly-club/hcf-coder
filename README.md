@@ -1,20 +1,22 @@
 # hcf-coder
 
-this is a slighty modified https://github.com/coder/code-server  
-We need to run it in our Kubernetes cluster and we need to mount our working dir via sshfs. 
+this is a slighty modified <https://github.com/coder/code-server>  
+We need to run it in our Kubernetes cluster and we need to mount our working dir via sshfs.
 This is how we run it
+
 - The secret is composed with 3 datas:
-  * ssh-privatekey
-  * ssh-publickey
-  * ssh-key-type  
+  - ssh-privatekey
+  - ssh-publickey
+  - ssh-key-type  
   
-# Tools included
+## Tools included
+
 - php
 - go
 - Github Copilot and Copilot-chat
   - note for upgrading copilot chat you need to edit its package.json for allowing current code version (ie replacing ^1.85 by >=1.85 for example)
 - rustc
-  - for building for windows x86_64 use 
+  - for building for windows x86_64 use
     - `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link`
     - `RUSTFLAGS="-Lnative=/usr/share/msvc/crt/lib/x86_64 -Lnative=/usr/share/msvc/sdk/lib/um/x86_64 -Lnative=/usr/share/msvc/sdk/lib/ucrt/x86_64"`
 - clang/llvm
@@ -22,14 +24,16 @@ This is how we run it
   - for targetting MSVC x86 use `. /usr/local/bin/msvc-x86.env`
   - for reverting to MSVC x86_64 use `. /usr/local/bin/msvc.env`
 
+## Install with helm
 
-# Install with helm
-```
+```sh
 helm repo add highcanfly https://helm-repo.highcanfly.club/
 helm repo update highcanfly
 helm install --create-namespace --namespace sandbox-code-server hcf-coder highcanfly/hcf-coder --values values.yaml
 ```
+
 Values contains:
+
 ```yaml
 DEBUG: false
 remoteHost: "1.2.3.4"
@@ -71,11 +75,14 @@ persistence:
     - ReadWriteOnce
 ```
 
-# Install with kubectl
+## Install with kubectl
+
 For example with a local ssh key:
+
 ```sh
 kubectl create -n $NAMESPACE secret generic ssh-key-secret --from-file=ssh-privatekey=$HOME/.ssh/id_ecdsa --from-file=ssh-publickey=$HOME/.ssh/id_ecdsa.pub --from-literal=ssh-key-type=ecdsa
 ```
+
 ```yaml
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -195,14 +202,19 @@ spec:
   - hosts: [coder.example.org]
     secretName: vscode-cert
 ```
-# Using with Docker
-Simply hit: 
+
+## Using with Docker
+
+Simply hit:
+
 ```sh
 docker run -p 8080:8080 highcanfly/code-server:latest
 ```
-And browse http://localhost:8080 from your browser
 
-# Building manually
+And browse <http://localhost:8080> from your browser
+
+## Building manually
+
 ```bash
 docker buildx create --use
 docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:1.5.16 --tag highcanfly/devserver-prebuild:latest  .
