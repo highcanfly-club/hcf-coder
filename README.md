@@ -217,6 +217,6 @@ And browse <http://localhost:8080> from your browser
 
 ```bash
 docker buildx create --use
-docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:1.5.16 --tag highcanfly/devserver-prebuild:latest  .
-docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:1.5.16 --tag highcanfly/code-server:latest  .
+docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:1.5.17 --tag highcanfly/devserver-prebuild:latest  .
+docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:1.5.17 --tag highcanfly/code-server:latest  .
 ```
