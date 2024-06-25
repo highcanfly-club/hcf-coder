@@ -215,13 +215,13 @@ And browse <http://localhost:8080> from your browser
 
 ## upgrading extensions
 go and download the extensions from the marketplace, then copy them to the bin folder
-Copilot: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
-Copilot-chat: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat
-Golang: https://marketplace.visualstudio.com/items?itemName=golang.Go
-Rust-analyser (in amd64 or arm64 subdir): https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer
-Python: https://marketplace.visualstudio.com/items?itemName=ms-python.python
-Markdown all in one: https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one
-Git lens: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
+Copilot: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot  
+Copilot-chat: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat  
+Golang: https://marketplace.visualstudio.com/items?itemName=golang.Go  
+Rust-analyser (in amd64 or arm64 subdir): https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer  
+Python: https://marketplace.visualstudio.com/items?itemName=ms-python.python  
+Markdown all in one: https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one  
+Git lens: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens  
 
 Run the `change-vsix-requirements.sh` script to update the `extensions.json` file for Copilot and Copilot-chat
 
