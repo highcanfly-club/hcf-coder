@@ -8,7 +8,7 @@ FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
 FROM codercom/code-server:latest as coder
 
-FROM ubuntu:latest
+FROM ubuntu:jammy
 
 USER 0
 ARG NODE_MAJOR="20"
