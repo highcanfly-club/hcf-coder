@@ -1,4 +1,4 @@
-FROM codercom/code-server:latest as coder
+FROM codercom/code-server:latest AS coder
 
 FROM highcanfly/devserver-prebuild:latest
 USER 0

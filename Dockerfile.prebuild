@@ -1,12 +1,12 @@
-FROM bitnami/oauth2-proxy:7-debian-11 as oauth2
+FROM bitnami/oauth2-proxy:7-debian-11 AS oauth2
 
-FROM highcanfly/secret2sshkey:latest  as secret2sshkey
+FROM highcanfly/secret2sshkey:latest  AS secret2sshkey
 
 FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:latest as coder
+FROM codercom/code-server:latest AS coder
 
 FROM ubuntu:jammy
 
