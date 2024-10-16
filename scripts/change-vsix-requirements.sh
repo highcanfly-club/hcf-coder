@@ -16,8 +16,7 @@ for EXTENSION in $(ls ./bin/GitHub.copilot*.vsix); do
     cd ./tmp/$UUID
     unzip ../../bin/$(basename $EXTENSION)
     rm ../../bin/$(basename $EXTENSION)
-    sed -ibak 's/\"vscode\":\"\^1\.[0-9]*\.[0-9]*\(-[0-9A-Za-z-]*\)*\"/\"vscode\":\">=1\.80\.0\"/g' extension/package.json
-    sed -ibak2 's/\"vscode\": \"\^1\.[0-9]*\.[0-9]*\(-[0-9A-Za-z-]*\)*\"/\"vscode\": \">=1\.80\.0\"/g' extension/package.json
+    sed -ibak 's/\"vscode\"[[:space:]]*:[[:space:]]*\"\^1\.[0-9]*\.[0-9]*\(-[0-9A-Za-z-]*\)*\"/\"vscode\":\">=1\.80\.0\"/g' extension/package.json
     rm -f extension/package.jsonbak*
     zip -r ../../bin/$(basename $EXTENSION) *
     cd $_PWD

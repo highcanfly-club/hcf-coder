@@ -224,6 +224,10 @@ Markdown all in one: https://marketplace.visualstudio.com/items?itemName=yzhang.
 Git lens: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens  
 
 Run the `change-vsix-requirements.sh` script to update the `extensions.json` file for Copilot and Copilot-chat
+For validating you can run something like:
+```sh
+scripts/change-vsix-requirements.sh && mkdir -p tmp && cd tmp && unzip ../bin/GitHub.copilot-chat-*.vsix && cd ..
+```
 
 ## Building manually
 
