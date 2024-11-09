@@ -234,6 +234,7 @@ scripts/change-vsix-requirements.sh && mkdir -p tmp && cd tmp && unzip ../bin/Gi
 ```bash
 docker login --username=highcanfly
 docker buildx create --use
-docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:1.93.1b --tag highcanfly/devserver-prebuild:latest  .
-docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:1.93.1b --tag highcanfly/code-server:latest  .
+docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:1.95.1 --tag highcanfly/devserver-prebuild:latest  .
+docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:1.95.1 --tag highcanfly/code-server:latest  .
+
 ```
