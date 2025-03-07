@@ -1,11 +1,34 @@
 FROM codercom/code-server:latest AS coder
 
+FROM ubuntu:noble AS downloader
+RUN apt-get update && apt-get install -y curl uuid-runtime zip
+COPY extensions.json /extensions.json
+RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_amd64_static_0.2.2 -o vsixHarvester ; \
+      else \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_arm64_static_0.2.2 -o vsixHarvester ; \
+      fi
+RUN chmod +x vsixHarvester \
+      && ./vsixHarvester --verbose -i /extensions.json
+RUN mkdir -p extensions/amd64 \
+      && mkdir -p extensions/arm64 \
+      && find ./extensions -name "*@linux-x64.vsix" | xargs -I '{}' mv '{}' ./extensions/amd64/ \
+      && find ./extensions -name "*@linux-arm64.vsix" | xargs -I '{}' mv '{}' ./extensions/arm64/
+# universalize Copilot
+COPY scripts/change-vsix-requirements.sh /change-vsix-requirements.sh
+RUN chmod +x /change-vsix-requirements.sh \
+      && /change-vsix-requirements.sh /extensions/MS-CEINTL.vscode-language-pack-fr*.vsix \
+      && /change-vsix-requirements.sh /extensions/GitHub.copilot*.vsix \
+      && /change-vsix-requirements.sh /extensions/GitHub.copilot-chat*.vsix \
+      && /change-vsix-requirements.sh /extensions/amd64/ms-toolsai.jupyter*.vsix \
+      && /change-vsix-requirements.sh /extensions/arm64/ms-toolsai.jupyter*.vsix 
+
 FROM highcanfly/devserver-prebuild:latest
 USER 0
 ARG NODE_MAJOR="20"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.23.3"
+ARG GOVERSION="1.24.1"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
@@ -20,7 +43,7 @@ RUN mkdir -p ${BASEDIR}/workdir \
       && mkdir -p ${BASEDIR}/.ssh \
       && mkdir -p /usr/share/img 
 
-COPY bin /ext 
+COPY --from=downloader /extensions /ext
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             for file in /ext/amd64/*.vsix; do \
                 code-server --install-extension $file; \
@@ -33,6 +56,7 @@ RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
 RUN for FILE in /ext/*.vsix; do \
         code-server --install-extension $FILE; \
     done
+COPY languagepacks.json /ext/languagepacks.json
 RUN mkdir -p  ${BASEDIR}/.local/share/code-server \
       && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
       && rm -rf /ext 

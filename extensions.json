@@ -4,14 +4,30 @@
     "GitHub.copilot-chat",
     "golang.Go",
     "yzhang.markdown-all-in-one",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "bradlc.vscode-tailwindcss",
+    "foxundermoon.shell-format",
+    "Lokalise.i18n-ally",
+    "MS-CEINTL.vscode-language-pack-fr",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-vscode.cmake-tools",
+    "ms-vscode.cpptools-themes",
+    "ms-vscode.vscode-typescript-next",
+    "MS-vsliveshare.vsliveshare",
+    "redhat.vscode-xml",
+    "redhat.vscode-yaml",
+    "Vue.volar"
   ],
-  "linux_x64":[
+  "linux_x64": [
     "rust-lang.rust-analyzer",
-    "ms-python.python"
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "ms-vscode.cpptools"
   ],
-  "linux_arm64":[
+  "linux_arm64": [
     "rust-lang.rust-analyzer",
-    "ms-python.python"
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "ms-vscode.cpptools"
   ]
 }

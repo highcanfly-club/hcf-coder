@@ -9,17 +9,25 @@
 # The updated extension files are then zipped back into a VSIX file with the original name and placed back in the ./bin directory.
 # The script then changes back to the original working directory and removes the temporary directory.
 # This process is repeated for all matching VSIX files in the ./bin directory.
+
 _PWD=$(pwd)
-for EXTENSION in $(ls ./bin/GitHub.copilot*.vsix); do
+
+EXTENSIONS_FILTER=$1
+if [ -z "$EXTENSIONS_FILTER" ]; then
+    EXTENSIONS_FILTER="GitHub.copilot*.vsix"
+fi
+ls $EXTENSIONS_FILTER
+for EXTENSION in $(ls $EXTENSIONS_FILTER); do
     UUID=$(uuidgen)
-    mkdir -p ./tmp/$UUID
-    cd ./tmp/$UUID
-    unzip ../../bin/$(basename $EXTENSION)
-    rm ../../bin/$(basename $EXTENSION)
+    mkdir -p /tmp/$UUID
+    cd /tmp/$UUID
+    unzip -q $EXTENSION
+    rm $EXTENSION
     sed -ibak 's/\"vscode\"[[:space:]]*:[[:space:]]*\"\^1\.[0-9]*\.[0-9]*\(-[0-9A-Za-z-]*\)*\"/\"vscode\":\">=1\.80\.0\"/g' extension/package.json
+    diff -u extension/package.jsonbak extension/package.json || true
     rm -f extension/package.jsonbak*
-    zip -r ../../bin/$(basename $EXTENSION) *
+    zip -q -r $EXTENSION *
     cd $_PWD
-    rm -rf ./tmp/$UUID
+    rm -rf /tmp/$UUID
 done
 

@@ -1,4 +1,4 @@
-FROM bitnami/oauth2-proxy:7-debian-11 AS oauth2
+FROM bitnami/oauth2-proxy:7-debian-12 AS oauth2
 
 FROM highcanfly/secret2sshkey:latest  AS secret2sshkey
 
@@ -8,7 +8,7 @@ FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
 FROM codercom/code-server:latest AS coder
 
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 USER 0
 ARG NODE_MAJOR="20"
@@ -20,12 +20,11 @@ ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
 WORKDIR ${BASEDIR}
 RUN mkdir -p ${BASEDIR} && sed -ibak 's/:\/root:/:\/home\/coder:/g' /etc/passwd 
-# RUN rm /var/lib/dpkg/info/libc-bin.* \
-#       && apt-get clean \
-#       && apt-get update \
-#       && apt install libc-bin
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg sshfs php-cli build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init python3-pip zip unzip musl-dev musl-tools\
-      && mkdir -p /etc/apt/keyrings \
+RUN apt-get update && \
+  apt-get install -y ca-certificates curl gnupg sshfs \
+  build-essential dnsutils iputils-ping lld llvm clang git cmake vim sudo dumb-init \
+  python3-pip zip unzip musl-dev musl-tools php-cli
+RUN mkdir -p /etc/apt/keyrings \
       && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
       && apt-get update \
@@ -43,20 +42,30 @@ RUN chmod ugo+x /usr/bin/start.sh \
       && echo ". /usr/local/go/bin/golang.env" >> /etc/profile \
       && echo ". /usr/local/bin/msvc.env" >> /etc/profile
 COPY hcf.png /usr/share/img/hcf.png 
-RUN ln -svf /usr/bin/clang-14 /usr/bin/clang-cl \
-      && ln -svf /usr/bin/ld.lld-14 /usr/bin/lld-link
+RUN ln -svf /usr/bin/clang-18 /usr/bin/clang-cl \
+      && ln -svf /usr/bin/ld.lld-18 /usr/bin/lld-link
 COPY --from=llvm4msvc-x86 /usr/share/msvc /usr/share/msvc
 COPY --from=llvm4msvc /usr/share/msvc /usr/share/msvc
-RUN curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-$(dpkg --print-architecture).tar.gz | tar -xz && mv go /usr/local/ \
-      && sed -ibak 's/:\/usr\/bin:/:\/usr\/bin:\/usr\/local\/go\/bin:/g' /etc/profile
+
+RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
+      curl -fsSL https://go.dev/dl/go1.24.1.linux-amd64.tar.gz | tar -xz && mv go /usr/local/ ;\
+      else \
+            curl -fsSL https://go.dev/dl/go1.24.1.linux-arm64.tar.gz | tar -xz && mv go /usr/local/; \
+      fi
 COPY --chmod=744 scripts/golang.env /usr/local/go/bin/golang.env
+RUN sed -ibak 's/:\/usr\/bin:/:\/usr\/bin:\/usr\/local\/go\/bin:/g' /etc/profile
+
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg \
-      && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" | tee /etc/apt/sources.list.d/docker.list \
+      && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list \
       && apt-get update \
       && apt-get install -y docker-ce docker-ce-cli containerd.io
-RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash - \ 
-      && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" \
-      && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash - &1> /dev/null &2> /dev/null
+RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" ;\
+      else \
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl" ; \
+      fi
+RUN chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
       && ${BASEDIR}/.cargo/bin/rustup target add x86_64-pc-windows-msvc \
       && ${BASEDIR}/.cargo/bin/rustup target add x86_64-unknown-linux-gnu \
@@ -79,7 +88,7 @@ RUN /usr/bin/bash -c 'source /usr/local/go/bin/golang.env && /usr/local/go/bin/g
 RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
-RUN cd /usr/lib/llvm-14/bin/ && ln -svf clang clang-cl
+RUN cd /usr/lib/llvm-18/bin/ && ln -svf clang clang-cl
 RUN git config --global user.email "hcf@coder" \
       && git config --global user.name "hcf coder"
 
