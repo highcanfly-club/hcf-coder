@@ -1,12 +1,14 @@
-FROM codercom/code-server:latest AS coder
+FROM codercom/code-server:noble AS coder
 
 FROM ubuntu:noble AS downloader
 RUN apt-get update && apt-get install -y curl uuid-runtime zip
 COPY extensions.json /extensions.json
 RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_amd64_static_0.2.2 -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/Swish/releases/download/1.0.7/swish_linux_amd64_static_1.0.7 -o swish ; \
       else \
             curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_arm64_static_0.2.2 -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/Swish/releases/download/1.0.7/swish_linux_arm64_static_1.0.7 -o swish ; \
       fi
 RUN chmod +x vsixHarvester \
       && ./vsixHarvester --verbose -i /extensions.json
@@ -77,6 +79,10 @@ RUN mv ${BASEDIR}/.gitconfig /vscode/
 RUN mv ${BASEDIR}/.config /vscode/  
 RUN mv ${BASEDIR}/.rustup /vscode/ 
 RUN mv ${BASEDIR}/go /vscode/ 
+COPY --from=downloader /swish /usr/bin/swish
+COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
+COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
+COPY --from=downloader /extensions.json /vsixHarvester.json
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
