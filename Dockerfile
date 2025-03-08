@@ -11,6 +11,7 @@ RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             curl -fsSL https://github.com/sctg-development/Swish/releases/download/1.0.7/swish_linux_arm64_static_1.0.7 -o swish ; \
       fi
 RUN chmod +x vsixHarvester \
+      && chmod +x swish \
       && ./vsixHarvester --verbose -i /extensions.json
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
