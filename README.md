@@ -23,10 +23,34 @@ This is how we run it
 - clang-cl / llvm-link: shortcuts $CL $LINK
   - for targetting MSVC x86 use `. /usr/local/bin/msvc-x86.env`
   - for reverting to MSVC x86_64 use `. /usr/local/bin/msvc.env`
+- Test Windows compilation can be found in `/usr/share/msvc/test`
+```bash
+cd /usr/share/msvc/test
+./test.sh
+```
+
+  the test.sh contains:
+```bash
+#!/bin/bash
+$CL /I include /c src/test.c
+$CL /I include /c src/MainWindow.c
+$CL /I include /c src/AboutDialog.c
+
+$LINK /subsystem:WINDOWS \
+    user32.lib kernel32.lib comctl32.lib \
+    test.obj MainWindow.obj AboutDialog.obj \
+    /out:test.exe
+
+$CL /I include /c src/simpletest.c
+$LINK /subsystem:WINDOWS \
+    user32.lib kernel32.lib comctl32.lib uuid.lib \
+    simpletest.obj \
+    /out:simpletest.exe
+```
 
 ## Install with helm
 
-```sh
+```bash
 helm repo add highcanfly https://helm-repo.highcanfly.club/
 helm repo update highcanfly
 helm install --create-namespace --namespace sandbox-code-server hcf-coder highcanfly/hcf-coder --values values.yaml
