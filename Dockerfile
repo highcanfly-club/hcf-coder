@@ -1,18 +1,24 @@
 FROM codercom/code-server:noble AS coder
+USER 0
+#RUN /usr/lib/code-server/bin/code-server -v || true
+RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
 
 FROM ubuntu:noble AS downloader
+ARG VSIXHARVESTER_VERSION="0.2.6"
+ARG SWISH_VERSION="1.0.7"
 RUN apt-get update && apt-get install -y curl uuid-runtime zip
 COPY extensions.json /extensions.json
 RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_amd64_static_0.2.2 -o vsixHarvester ; \
-            curl -fsSL https://github.com/sctg-development/Swish/releases/download/1.0.7/swish_linux_amd64_static_1.0.7 -o swish ; \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_amd64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/Swish/releases/download/${SWISH_VERSION}/swish_linux_amd64_static_${SWISH_VERSION} -o swish ; \
       else \
-            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/0.2.2/vsixHarvester_linux_arm64_static_0.2.2 -o vsixHarvester ; \
-            curl -fsSL https://github.com/sctg-development/Swish/releases/download/1.0.7/swish_linux_arm64_static_1.0.7 -o swish ; \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_arm64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/Swish/releases/download/${SWISH_VERSION}/swish_linux_arm64_static_${SWISH_VERSION} -o swish ; \
       fi
+COPY --from=coder /usr/lib/code-server/engine_version.txt /engine_version.txt
 RUN chmod +x vsixHarvester \
       && chmod +x swish \
-      && ./vsixHarvester --verbose -i /extensions.json
+      && ./vsixHarvester --verbose -i /extensions.json -e $(cat /engine_version.txt)
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
       && find ./extensions -name "*@linux-x64.vsix" | xargs -I '{}' mv '{}' ./extensions/amd64/ \
