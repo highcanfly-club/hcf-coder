@@ -1,4 +1,4 @@
-FROM codercom/code-server:noble AS coder
+FROM codercom/code-server:4.98.0-noble AS coder
 USER 0
 #RUN /usr/lib/code-server/bin/code-server -v || true
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
