@@ -6,7 +6,7 @@ FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:4.98.2-noble AS coder
+FROM codercom/code-server:4.99.3-noble AS coder
 
 FROM ubuntu:noble
 

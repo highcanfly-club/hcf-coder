@@ -1,4 +1,4 @@
-FROM codercom/code-server:4.98.2-noble AS coder
+FROM codercom/code-server:4.99.3-noble AS coder
 USER 0
 #RUN /usr/lib/code-server/bin/code-server -v || true
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -90,6 +90,8 @@ COPY --from=downloader /swish /usr/bin/swish
 COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json
+COPY --from=ismogroup/busybox:1.37.0-php-8.3-apache /busybox-1.37.0/_install/bin/busybox /bin/busybox
+RUN  /bin/busybox --install -s
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
