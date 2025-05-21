@@ -6,7 +6,7 @@ FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:4.99.3-noble AS coder
+FROM codercom/code-server:4.100.2-noble AS coder
 
 FROM ubuntu:noble
 
@@ -48,9 +48,9 @@ COPY --from=llvm4msvc-x86 /usr/share/msvc /usr/share/msvc
 COPY --from=llvm4msvc /usr/share/msvc /usr/share/msvc
 
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-      curl -fsSL https://go.dev/dl/go1.24.1.linux-amd64.tar.gz | tar -xz && mv go /usr/local/ ;\
+      curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-amd64.tar.gz | tar -xz && mv go /usr/local/ ;\
       else \
-            curl -fsSL https://go.dev/dl/go1.24.1.linux-arm64.tar.gz | tar -xz && mv go /usr/local/; \
+            curl -fsSL https://go.dev/dl/go${GOVERSION}.linux-arm64.tar.gz | tar -xz && mv go /usr/local/; \
       fi
 COPY --chmod=744 scripts/golang.env /usr/local/go/bin/golang.env
 RUN sed -ibak 's/:\/usr\/bin:/:\/usr\/bin:\/usr\/local\/go\/bin:/g' /etc/profile
