@@ -1,6 +1,5 @@
 {
   "universal": [
-    "GitHub.copilot",
     "GitHub.copilot-chat",
     "golang.Go",
     "yzhang.markdown-all-in-one",
@@ -13,7 +12,6 @@
     "ms-vscode.cmake-tools",
     "ms-vscode.cpptools-themes",
     "ms-vscode.vscode-typescript-next",
-    "MS-vsliveshare.vsliveshare",
     "quicktype.quicktype",
     "redhat.vscode-xml",
     "redhat.vscode-yaml",

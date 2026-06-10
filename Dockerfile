@@ -1,24 +1,22 @@
-FROM codercom/code-server:4.100.2-noble AS coder
+FROM codercom/code-server:4.123.0-noble AS coder
 USER 0
 #RUN /usr/lib/code-server/bin/code-server -v || true
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
 
 FROM ubuntu:noble AS downloader
-ARG VSIXHARVESTER_VERSION="0.2.6"
-ARG SWISH_VERSION="1.0.7"
+ARG VSIXHARVESTER_VERSION="0.2.8"
 RUN apt-get update && apt-get install -y curl uuid-runtime zip
+COPY --from=sctg/clinepool-download /usr/local/bin/clinepool-download /usr/bin/clinepool-download
 COPY extensions.json /extensions.json
 RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_amd64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
-            curl -fsSL https://github.com/sctg-development/Swish/releases/download/${SWISH_VERSION}/swish_linux_amd64_static_${SWISH_VERSION} -o swish ; \
       else \
             curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_arm64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
-            curl -fsSL https://github.com/sctg-development/Swish/releases/download/${SWISH_VERSION}/swish_linux_arm64_static_${SWISH_VERSION} -o swish ; \
       fi
 COPY --from=coder /usr/lib/code-server/engine_version.txt /engine_version.txt
 RUN chmod +x vsixHarvester \
-      && chmod +x swish \
       && ./vsixHarvester --verbose -i /extensions.json -e $(cat /engine_version.txt)
+RUN /usr/bin/clinepool-download --vsix --out-file /extensions/clinepool-extensions.vsix
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
       && find ./extensions -name "*@linux-x64.vsix" | xargs -I '{}' mv '{}' ./extensions/amd64/ \
@@ -28,16 +26,15 @@ COPY scripts/change-vsix-requirements.sh /change-vsix-requirements.sh
 RUN chmod +x /change-vsix-requirements.sh \
       && /change-vsix-requirements.sh /extensions/MS-CEINTL.vscode-language-pack-fr*.vsix \
       && /change-vsix-requirements.sh /extensions/GitHub.copilot*.vsix \
-      && /change-vsix-requirements.sh /extensions/GitHub.copilot-chat*.vsix \
       && /change-vsix-requirements.sh /extensions/amd64/ms-toolsai.jupyter*.vsix \
       && /change-vsix-requirements.sh /extensions/arm64/ms-toolsai.jupyter*.vsix 
 
 FROM highcanfly/devserver-prebuild:latest
 USER 0
-ARG NODE_MAJOR="20"
+ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.24.1"
+ARG GOVERSION="1.26.4"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
@@ -86,7 +83,6 @@ RUN mv ${BASEDIR}/.gitconfig /vscode/
 RUN mv ${BASEDIR}/.config /vscode/  
 RUN mv ${BASEDIR}/.rustup /vscode/ 
 RUN mv ${BASEDIR}/go /vscode/ 
-COPY --from=downloader /swish /usr/bin/swish
 COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json

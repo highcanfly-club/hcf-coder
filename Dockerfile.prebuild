@@ -1,20 +1,25 @@
-FROM bitnami/oauth2-proxy:7-debian-12 AS oauth2
+FROM golang:1.26-trixie AS oauth2-builder
+RUN git clone --depth 1 --branch release/v7.15.1 https://github.com/oauth2-proxy/oauth2-proxy.git && \
+    cd oauth2-proxy && \
+    go build
 
 FROM highcanfly/secret2sshkey:latest  AS secret2sshkey
+
+FROM sctg/clinepool-download:latest AS clinepool-download
 
 FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:4.100.2-noble AS coder
+FROM codercom/code-server:4.123.0-noble AS coder
 
 FROM ubuntu:noble
 
 USER 0
-ARG NODE_MAJOR="20"
+ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.24.1"
+ARG GOVERSION="1.26.4"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
@@ -29,7 +34,7 @@ RUN mkdir -p /etc/apt/keyrings \
       && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
       && apt-get update \
       && apt-get install nodejs -y
-COPY --from=oauth2 /opt/bitnami/oauth2-proxy/bin/oauth2-proxy /bin/oauth2-proxy
+COPY --from=oauth2-builder /go/oauth2-proxy /bin/oauth2-proxy
 COPY --from=secret2sshkey /app/secret2sshkey /usr/bin/secret2sshkey
 COPY scripts/start.sh /usr/bin/start.sh
 
@@ -89,6 +94,7 @@ RUN apt dist-upgrade -y && apt-get clean autoclean \
       && apt-get autoremove --yes \
       && rm -rf /var/lib/{apt,dpkg,cache,log}/
 RUN cd /usr/lib/llvm-18/bin/ && ln -svf clang clang-cl
+COPY --from=clinepool-download /usr/local/bin/clinepool-download /usr/bin/clinepool-download
 RUN git config --global user.email "hcf@coder" \
       && git config --global user.name "hcf coder"
 

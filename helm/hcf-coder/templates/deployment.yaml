@@ -40,6 +40,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          - name: KEYPOOL_LIVE_SECRET
+            value: {{ .Values.clinepool.keypool_live_secret | quote }}
+          - name: KEYPOOL_VAULT_URL
+            value: {{ .Values.clinepool.keypool_vault_url | quote }}
           - name: REMOTEHOST
             value: {{ .Values.remoteHost | quote }}
           - name: REMOTEPORT
