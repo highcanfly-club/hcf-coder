@@ -258,7 +258,7 @@ scripts/change-vsix-requirements.sh && mkdir -p tmp && cd tmp && unzip ../bin/Gi
 ```bash
 docker login --username=highcanfly
 docker buildx create --use
-export hcf_version="1.123.0"
+export hcf_version="1.126.0"
 docker buildx build -f Dockerfile.prebuild --push --platform linux/amd64,linux/arm64 --tag highcanfly/devserver-prebuild:${hcf_version} --tag highcanfly/devserver-prebuild:latest  .
 docker buildx build --push --platform linux/amd64,linux/arm64 --tag highcanfly/code-server:${hcf_version} --tag highcanfly/code-server:latest  .
 ```

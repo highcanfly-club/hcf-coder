@@ -1,5 +1,5 @@
 FROM golang:1.26-trixie AS oauth2-builder
-RUN git clone --depth 1 --branch release/v7.15.1 https://github.com/oauth2-proxy/oauth2-proxy.git && \
+RUN git clone --depth 1 --branch release/v7.15.3 https://github.com/oauth2-proxy/oauth2-proxy.git && \
     cd oauth2-proxy && \
     go build
 
@@ -11,7 +11,7 @@ FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:4.123.0-noble AS coder
+FROM codercom/code-server:4.126.0-noble AS coder
 
 FROM ubuntu:noble
 
