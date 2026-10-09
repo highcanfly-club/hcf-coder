@@ -1,3 +1,7 @@
+FROM golang:trixie AS entangle-builder
+RUN git clone --depth 1 https://github.com/sctg-development/entangle.git && \
+    cd entangle && \
+    go build -o /app/entangle
 FROM codercom/code-server:4.141.0-noble AS coder
 USER 0
 #RUN /usr/lib/code-server/bin/code-server -v || true
@@ -20,7 +24,7 @@ RUN /usr/bin/clinepool-download --vsix --out-file /extensions/clinepool-extensio
 COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
 RUN /usr/bin/kilocode-download --vsix --out-file /extensions/kilocode-extensions.vsix
 RUN /usr/bin/kilocode-download --cli --out-file /usr/bin/kilo
-RUN curl -fsSL https://github.com/sctg-development/entangle/releases/download/v0.7.1/claude-teleport-linux-$(dpkg --print-architecture) -o /usr/bin/entangle && chmod +x /usr/bin/entangle
+COPY --from=entangle-builder /app/entangle /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
       && find ./extensions -name "*@linux-x64.vsix" | xargs -I '{}' mv '{}' ./extensions/amd64/ \
@@ -38,7 +42,7 @@ USER 0
 ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.26.4"
+ARG GOVERSION="1.27.2"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
