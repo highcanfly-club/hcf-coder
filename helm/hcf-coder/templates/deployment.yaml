@@ -57,6 +57,10 @@ spec:
             value: {{ .Values.remotePath | quote }}
           - name: APPNAME
             value: {{ .Values.publicName | quote }}
+          - name: ENTANGLE_RENDZVOUS
+            value: {{ .Values.entangle.rendezVousServer | quote }}
+          - name: ENTANGLE_RELAY
+            value: {{ .Values.entangle.relayServer | quote }}
           - name: GET_KUBECONFIG_ONE
             valueFrom:
               secretKeyRef:

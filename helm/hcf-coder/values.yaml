@@ -101,3 +101,7 @@ affinity: {}
 
 oauth2-proxy:
   enabled: false
+
+entangle:
+  rendezVousServer: "ws://relay.magic-wormhole.io:4000/v1"
+  relayServer: "transit.magic-wormhole.io:4001"
