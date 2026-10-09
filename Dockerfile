@@ -1,4 +1,4 @@
-FROM codercom/code-server:4.126.0-noble AS coder
+FROM codercom/code-server:4.141.0-noble AS coder
 USER 0
 #RUN /usr/lib/code-server/bin/code-server -v || true
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -17,6 +17,10 @@ COPY --from=coder /usr/lib/code-server/engine_version.txt /engine_version.txt
 RUN chmod +x vsixHarvester \
       && ./vsixHarvester --verbose -i /extensions.json -e $(cat /engine_version.txt)
 RUN /usr/bin/clinepool-download --vsix --out-file /extensions/clinepool-extensions.vsix
+COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
+RUN /usr/bin/kilocode-download --vsix --out-file /extensions/kilocode-extensions.vsix
+RUN /usr/bin/kilocode-download --cli --out-file /usr/bin/kilo
+RUN curl -fsSL https://github.com/sctg-development/entangle/releases/download/v0.7.1/claude-teleport-linux-$(dpkg --print-architecture) -o /usr/bin/entangle && chmod +x /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
       && find ./extensions -name "*@linux-x64.vsix" | xargs -I '{}' mv '{}' ./extensions/amd64/ \
@@ -87,6 +91,8 @@ COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json
 COPY --from=ismogroup/busybox:1.37.0-php-8.3-apache /busybox-1.37.0/_install/bin/busybox /bin/busybox
+COPY --from=downloader /usr/bin/kilo /usr/bin/kilo
+COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
 RUN  /bin/busybox --install -s
 USER 0
 EXPOSE 8080
