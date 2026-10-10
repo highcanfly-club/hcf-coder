@@ -61,6 +61,8 @@ spec:
             value: {{ .Values.entangle.rendezVousServer | quote }}
           - name: ENTANGLE_RELAY
             value: {{ .Values.entangle.relayServer | quote }}
+          - name: ENTANGLE_WORDLIST
+            value: {{ .Values.entangle.wordlist | quote }}
           - name: GET_KUBECONFIG_ONE
             valueFrom:
               secretKeyRef:

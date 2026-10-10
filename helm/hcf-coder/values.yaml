@@ -105,3 +105,4 @@ oauth2-proxy:
 entangle:
   rendezVousServer: "ws://relay.magic-wormhole.io:4000/v1"
   relayServer: "transit.magic-wormhole.io:4001"
+  wordlist: "eff"
