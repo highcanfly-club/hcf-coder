@@ -1,6 +1,6 @@
 {
-  "editor.fontSize": 12,
-  "terminal.integrated.fontSize": 12,
+  "editor.fontSize": 10,
+  "terminal.integrated.fontSize": 10,
   "window.zoomLevel": -1,
   "editor.minimap.enabled": false,
   "breadcrumbs.enabled": false,
