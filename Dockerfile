@@ -4,7 +4,11 @@ RUN git clone --depth 1 https://github.com/sctg-development/entangle.git && \
     go build -o /app/entangle
 
 FROM astral/uv:trixie AS mistral-builder
-RUN git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    . "$HOME/.cargo/env" && \
+    git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
     uv build --wheel
 FROM codercom/code-server:4.141.0-noble AS coder
