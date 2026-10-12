@@ -1,6 +1,6 @@
 {
   "universal": [
-    "GitHub.copilot-chat",
+    "GitHub.copilot",
     "golang.Go",
     "yzhang.markdown-all-in-one",
     "eamodio.gitlens",
@@ -21,12 +21,14 @@
     "rust-lang.rust-analyzer",
     "ms-python.python",
     "ms-toolsai.jupyter",
-    "ms-vscode.cpptools"
+    "ms-vscode.cpptools",
+    "anthropic.claude-code"
   ],
   "linux_arm64": [
     "rust-lang.rust-analyzer",
     "ms-python.python",
     "ms-toolsai.jupyter",
-    "ms-vscode.cpptools"
+    "ms-vscode.cpptools",
+    "anthropic.claude-code"
   ]
 }

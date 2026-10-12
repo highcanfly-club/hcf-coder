@@ -8,7 +8,7 @@ USER 0
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
 
 FROM ubuntu:noble AS downloader
-ARG VSIXHARVESTER_VERSION="0.2.8"
+ARG VSIXHARVESTER_VERSION="0.2.9"
 RUN apt-get update && apt-get install -y curl uuid-runtime zip
 COPY --from=sctg/clinepool-download /usr/local/bin/clinepool-download /usr/bin/clinepool-download
 COPY extensions.json /extensions.json
@@ -20,10 +20,10 @@ RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
 COPY --from=coder /usr/lib/code-server/engine_version.txt /engine_version.txt
 RUN chmod +x vsixHarvester \
       && ./vsixHarvester --verbose -i /extensions.json -e $(cat /engine_version.txt)
-RUN /usr/bin/clinepool-download --vsix --out-file /extensions/clinepool-extensions.vsix
+RUN /usr/bin/clinepool-download -v --vsix --out-file /extensions/clinepool-extensions.vsix
 COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
-RUN /usr/bin/kilocode-download --vsix --out-file /extensions/kilocode-extensions.vsix
-RUN /usr/bin/kilocode-download --cli --out-file /usr/bin/kilo
+RUN /usr/bin/kilocode-download -v --vsix --out-file /extensions/kilocode-extensions.vsix
+RUN /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo
 COPY --from=entangle-builder /app/entangle /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
@@ -97,6 +97,12 @@ COPY --from=downloader /extensions.json /vsixHarvester.json
 COPY --from=ismogroup/busybox:1.37.0-php-8.3-apache /busybox-1.37.0/_install/bin/busybox /bin/busybox
 COPY --from=downloader /usr/bin/kilo /usr/bin/kilo
 COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
+ARG HELM_VERSION="v4.3.0"
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "amd64" ]; then HELM_ARCH="amd64"; else HELM_ARCH="arm64"; fi && \
+    curl -fsSL "https://get.helm.sh/helm-${HELM_VERSION}-linux-${HELM_ARCH}.tar.gz" | tar -xz -C /tmp && \
+    mv /tmp/linux-${HELM_ARCH}/helm /usr/bin/helm && \
+    chmod +x /usr/bin/helm
 RUN  /bin/busybox --install -s
 USER 0
 EXPOSE 8080
