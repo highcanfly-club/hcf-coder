@@ -4,18 +4,18 @@ RUN git clone --depth 1 https://github.com/sctg-development/entangle.git && \
     go build -o /app/entangle
 FROM codercom/code-server:4.141.0-noble AS coder
 USER 0
-#RUN /usr/lib/code-server/bin/code-server -v || true
+
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
 
 FROM ubuntu:noble AS downloader
-ARG VSIXHARVESTER_VERSION="0.2.9"
+ARG VSIXHARVESTER_VERSION="0.2.12"
 RUN apt-get update && apt-get install -y curl uuid-runtime zip
 COPY --from=sctg/clinepool-download /usr/local/bin/clinepool-download /usr/bin/clinepool-download
 COPY extensions.json /extensions.json
 RUN  if [ $(dpkg --print-architecture) = "amd64" ] ; then \
-            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_amd64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_ubuntu-24.04_amd64_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
       else \
-            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_linux_arm64_static_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
+            curl -fsSL https://github.com/sctg-development/vsixHarvester/releases/download/${VSIXHARVESTER_VERSION}/vsixHarvester_ubuntu-24.04_arm64_${VSIXHARVESTER_VERSION} -o vsixHarvester ; \
       fi
 COPY --from=coder /usr/lib/code-server/engine_version.txt /engine_version.txt
 RUN chmod +x vsixHarvester \
@@ -110,6 +110,7 @@ COPY --from=downloader /extensions.json /vsixHarvester.json
 COPY --from=ismogroup/busybox:1.37.0-php-8.3-apache /busybox-1.37.0/_install/bin/busybox /bin/busybox
 COPY --from=downloader /usr/bin/kilo /usr/bin/kilo
 COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
+COPY --from=ghcr.io/getsops/sops:v3.13.3 /usr/local/bin/sops /usr/local/bin/sops
 ARG HELM_VERSION="v4.3.0"
 RUN ARCH=$(dpkg --print-architecture) && \
     if [ "$ARCH" = "amd64" ]; then HELM_ARCH="amd64"; else HELM_ARCH="arm64"; fi && \
