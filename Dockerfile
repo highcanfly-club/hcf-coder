@@ -2,6 +2,11 @@ FROM golang:trixie AS entangle-builder
 RUN git clone --depth 1 https://github.com/sctg-development/entangle.git && \
     cd entangle && \
     go build -o /app/entangle
+
+FROM astral/uv:trixie AS mistral-builder
+RUN git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
+    cd mistral-vibe && \
+    uv build --wheel
 FROM codercom/code-server:4.141.0-noble AS coder
 USER 0
 
@@ -108,8 +113,11 @@ COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json
 COPY --from=ismogroup/busybox:1.37.0-php-8.3-apache /busybox-1.37.0/_install/bin/busybox /bin/busybox
+COPY --from=astral/uv:trixie /usr/local/bin/uv /usr/local/bin/uv
 COPY --from=downloader /usr/bin/kilo /usr/bin/kilo
 COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
+COPY --from=mistral-builder /mistral-vibe/dist/*.whl /tmp/mistral/
+RUN uv pip install --system /tmp/mistral/*.whl && rm -rf /tmp/mistral
 COPY --from=ghcr.io/getsops/sops:v3.13.3 /usr/local/bin/sops /usr/local/bin/sops
 ARG HELM_VERSION="v4.3.0"
 RUN ARCH=$(dpkg --print-architecture) && \
