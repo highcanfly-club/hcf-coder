@@ -41,6 +41,13 @@ persistence:
   accessModes:
   - ReadWriteOnce
 replicaCount: 1
+# Claude Code subscription token (generate it with `claude setup-token`). When set, Claude Code
+# uses it instead of the interactive OAuth login, whose localhost callback cannot reach the pod.
+claudeCode:
+  oauthToken: ""
+  # or reference a secret you manage yourself (sops, sealed-secrets...), key defaults to oauth-token
+  existingSecret: ""
+  existingSecretKey: oauth-token
 getKubeconfigONE: 'scp user@some-server:/home/user/.kube/config /dev/stdout'
 getKubeconfigTWO: 'curl https://user:password@some-server/kube.config'
 

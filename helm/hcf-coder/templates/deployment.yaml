@@ -71,6 +71,13 @@ spec:
             value: {{ .Values.entangle.relayServer | quote }}
           - name: ENTANGLE_WORDLIST
             value: {{ .Values.entangle.wordlist | quote }}
+          {{- if or .Values.claudeCode.oauthToken .Values.claudeCode.existingSecret }}
+          - name: CLAUDE_CODE_OAUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.claudeCode.existingSecret | default "claude-code-credentials" }}
+                key: {{ .Values.claudeCode.existingSecretKey }}
+          {{- end }}
           - name: GET_KUBECONFIG_ONE
             valueFrom:
               secretKeyRef:
