@@ -31,6 +31,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "hcf-coder.serviceAccountName" . }}
+      {{- with .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -57,6 +61,10 @@ spec:
             value: {{ .Values.remotePath | quote }}
           - name: APPNAME
             value: {{ .Values.publicName | quote }}
+          - name: LOCALE
+            value: {{ .Values.locale | quote }}
+          - name: HCF_SEED_PROFILES
+            value: {{ .Values.seedProfiles | quote }}
           - name: ENTANGLE_RENDZVOUS
             value: {{ .Values.entangle.rendezVousServer | quote }}
           - name: ENTANGLE_RELAY
@@ -87,15 +95,17 @@ spec:
             initialDelaySeconds: 300 # 5 minutes because it takes time to download the image wich is 2.5GB
             periodSeconds: 20
           {{- end }}
-          {{ if .Values.persistence.enabled}}
+          {{- if or .Values.persistence.enabled .Values.dockersock }}
           volumeMounts:
+            {{- if .Values.persistence.enabled }}
             - name: hcf-coder-storage
-              mountPath: /home/coder
-            {{ if .Values.dockersock }}
+              mountPath: {{ .Values.persistence.mountPath }}
+            {{- end }}
+            {{- if .Values.dockersock }}
             - name: dockersock
               mountPath: /var/run/docker.sock
-              {{ end }}
-          {{ end }}
+            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -110,15 +120,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if or .Values.persistence.enabled .Values.dockersock }}
       volumes:
-      {{- if .Values.persistence.enabled}}
+        {{- if .Values.persistence.enabled }}
         - name: hcf-coder-storage
           persistentVolumeClaim:
-            claimName: pvc-hcf-coder
-      {{- end -}}  
-        {{ if .Values.dockersock }}
+            claimName: {{ .Values.persistence.existingClaim | default "pvc-hcf-coder" }}
+        {{- end }}
+        {{- if .Values.dockersock }}
         - name: dockersock
           hostPath:
             path: {{ .Values.dockersock }}  #or the containerd socket
-        {{ end }}
-
+        {{- end }}
+      {{- end }}

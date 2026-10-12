@@ -19,8 +19,24 @@ users:
 clinepool:
   keypool_vault_url: "https://vault.keypool.live"
   keypool_live_secret: "0123456789abcdef0123456789abcdef"
+# Display language of the UI (written once to argv.json if the user has not chosen one)
+locale: "fr"
+# Register "Desktop" and "iPad" settings profiles at start (experimental)
+seedProfiles: true
+# Extra /etc/hosts entries, e.g.
+# hostAliases:
+# - ip: 100.64.0.4
+#   hostnames:
+#   - k8s-api
+#   - k8s-api.private
+hostAliases: []
 persistence:
   enabled: false
+  # mounted on the home of the coder user: holds user settings, view placement (state.vscdb),
+  # Kilo/Cline globalStorage, ~/.config/kilo, ~/.claude
+  mountPath: /home/coder
+  existingClaim: ""
+  storageClass: ""
   size: "1Gi"
   accessModes:
   - ReadWriteOnce
