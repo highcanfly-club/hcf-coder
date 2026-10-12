@@ -15,7 +15,8 @@
     "quicktype.quicktype",
     "redhat.vscode-xml",
     "redhat.vscode-yaml",
-    "Vue.volar"
+    "Vue.volar",
+    "signageos.signageos-vscode-sops"
   ],
   "linux_x64": [
     "rust-lang.rust-analyzer",
