@@ -1,0 +1,38 @@
+#!/bin/bash
+# hcf-layout ipad|desktop|status
+# Merges a layout fragment (font size, zoom, bars...) into the persistent User/settings.json.
+# Only the keys of the fragment are touched; every other user setting is kept.
+set -u
+BASEDIR=${BASEDIR:-$HOME}
+USER_DIR=${HCF_USER_DIR:-${BASEDIR}/.local/share/code-server/User}
+CONFIG_DIR=${HCF_CONFIG_DIR:-/usr/share/hcf-coder/config}
+SETTINGS=${USER_DIR}/settings.json
+
+usage() { echo "usage: hcf-layout ipad|desktop|status" >&2; exit 2; }
+[ $# -eq 1 ] || usage
+
+case "$1" in
+  ipad|desktop)
+    FRAGMENT=${CONFIG_DIR}/profiles/$1.json
+    [ -f "$FRAGMENT" ] || { echo "missing $FRAGMENT" >&2; exit 1; }
+    mkdir -p "$USER_DIR"
+    [ -s "$SETTINGS" ] || echo '{}' > "$SETTINGS"
+    if ! jq -e . "$SETTINGS" >/dev/null 2>&1; then
+      echo "$SETTINGS is not strict JSON (comments?), not modified. Edit it by hand with $FRAGMENT" >&2
+      exit 1
+    fi
+    TMP=$(mktemp "${SETTINGS}.XXXXXX")
+    jq -s '.[0] * .[1]' "$SETTINGS" "$FRAGMENT" > "$TMP" && mv "$TMP" "$SETTINGS"
+    echo "layout '$1' applied to $SETTINGS (reload the window: Developer: Reload Window)"
+    ;;
+  status)
+    [ -f "$SETTINGS" ] || { echo "no settings"; exit 0; }
+    for L in ipad desktop; do
+      if jq -e -s '.[0] as $s | .[1] | to_entries | all(.[]; $s[.key] == .value)' "$SETTINGS" "${CONFIG_DIR}/profiles/$L.json" >/dev/null 2>&1; then
+        echo "$L"; exit 0
+      fi
+    done
+    echo "custom"
+    ;;
+  *) usage ;;
+esac

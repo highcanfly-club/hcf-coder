@@ -1,0 +1,39 @@
+# prebuild (toolchains, rarely changes) then final image (code-server + extensions).
+# Both are built natively per architecture (amd64: ubuntu-26.04, arm64: ubuntu-26.04-arm)
+# and merged into one manifest. The final build waits for the prebuild: the two used to run
+# at the same time on a release, so the final image could be built on the previous prebuild.
+name: Build and publish amd64/arm64 to Docker Hub
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      prebuild:
+        description: Rebuild highcanfly/devserver-prebuild first
+        type: boolean
+        default: true
+
+concurrency:
+  group: build-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prebuild:
+    if: ${{ github.event_name == 'release' || inputs.prebuild }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      dockerfile: Dockerfile.prebuild
+      image: highcanfly/devserver-prebuild
+      artifact-prefix: prebuild
+    secrets: inherit
+
+  final:
+    needs: prebuild
+    # run when the prebuild succeeded or was skipped, never when it failed
+    if: ${{ !cancelled() && (needs.prebuild.result == 'success' || needs.prebuild.result == 'skipped') }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      dockerfile: Dockerfile
+      artifact-prefix: final
+    secrets: inherit

@@ -1,0 +1,11 @@
+{
+  "editor.fontSize": 14,
+  "terminal.integrated.fontSize": 14,
+  "window.zoomLevel": 0,
+  "editor.minimap.enabled": true,
+  "breadcrumbs.enabled": true,
+  "workbench.tree.indent": 8,
+  "workbench.editor.tabSizing": "fit",
+  "workbench.layoutControl.enabled": true,
+  "window.commandCenter": true
+}

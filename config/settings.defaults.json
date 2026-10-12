@@ -1,0 +1,10 @@
+{
+  "workbench.colorTheme": "Visual Studio Dark",
+  "workbench.secondarySideBar.defaultVisibility": "visible",
+  "telemetry.telemetryLevel": "off",
+  "extensions.autoUpdate": false,
+  "extensions.autoCheckUpdates": false,
+  "editor.fontSize": 14,
+  "terminal.integrated.fontSize": 14,
+  "window.zoomLevel": 0
+}

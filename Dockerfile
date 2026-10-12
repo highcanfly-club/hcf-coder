@@ -51,46 +51,59 @@ WORKDIR ${BASEDIR}
 COPY --from=coder /usr/lib/code-server /usr/lib/code-server
 COPY --from=coder /usr/bin/code-server /usr/bin/code-server
 COPY --from=coder /usr/bin/entrypoint.sh /usr/bin/entrypoint.sh
+ARG EXTENSIONS_DIR=/opt/code-server/extensions
+ENV EXTENSIONS_DIR=${EXTENSIONS_DIR}
+# jq is used by start.sh and hcf-layout to merge JSON settings
+RUN command -v jq >/dev/null || (apt-get update && apt-get install -y --no-install-recommends jq && rm -rf /var/lib/apt/lists/*)
 RUN mkdir -p ${BASEDIR}/workdir \
       && mkdir -p ${BASEDIR}/.local \
-      && mkdir -p ${BASEDIR}/.config \  
+      && mkdir -p ${BASEDIR}/.config \
       && mkdir -p ${BASEDIR}/.ssh \
-      && mkdir -p /usr/share/img 
+      && mkdir -p ${EXTENSIONS_DIR} \
+      && mkdir -p /usr/share/img
 
+# Extensions live in the image (not on the PVC): a new image brings new extension versions.
 COPY --from=downloader /extensions /ext
 RUN   if [ $(dpkg --print-architecture) = "amd64" ] ; then \
             for file in /ext/amd64/*.vsix; do \
-                code-server --install-extension $file; \
+                code-server --extensions-dir ${EXTENSIONS_DIR} --install-extension $file; \
             done; \
       else \
             for file in /ext/arm64/*.vsix; do \
-                code-server --install-extension $file; \
+                code-server --extensions-dir ${EXTENSIONS_DIR} --install-extension $file; \
             done; \
       fi
 RUN for FILE in /ext/*.vsix; do \
-        code-server --install-extension $FILE; \
+        code-server --extensions-dir ${EXTENSIONS_DIR} --install-extension $FILE; \
     done
+# languagepacks.json is rebuilt for the installed fr pack (real path and version) and copied
+# into the user-data-dir at each start by start.sh
 COPY languagepacks.json /ext/languagepacks.json
-RUN mkdir -p  ${BASEDIR}/.local/share/code-server \
-      && cat /ext/languagepacks.json >  ${BASEDIR}/.local/share/code-server/languagepacks.json \
-      && rm -rf /ext 
-RUN mkdir -p  ${BASEDIR}/.local/share/code-server/User/globalStorage && \
-      mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/locale.json && \
-      mkdir -p  ${BASEDIR}/.local/share/code-server/User && echo '{"locale":"fr"}' | tee  ${BASEDIR}/.local/share/code-server/User/argv.json && \
-      mkdir -p ${BASEDIR}/.vscode && echo '{"workbench.colorTheme": "Visual Studio Dark"}' | tee ${BASEDIR}/.vscode/settings.json
+RUN FRDIR=$(ls -d ${EXTENSIONS_DIR}/ms-ceintl.vscode-language-pack-fr-* | head -n1) \
+      && FRVER=${FRDIR##*-} \
+      && jq --arg dir "$FRDIR" --arg ver "$FRVER" \
+           '.fr.extensions[0].version = $ver | .fr.translations |= with_entries(.value |= sub("^.*/translations/"; $dir + "/translations/"))' \
+           /ext/languagepacks.json > /usr/share/languagepacks.json \
+      && rm -rf /ext
+# Defaults and layout profiles (see scripts/start.sh and scripts/hcf-layout)
+COPY config /usr/share/hcf-coder/config
+COPY scripts/hcf-layout /usr/bin/hcf-layout
+# start.sh is also baked in the prebuild image: copy it here so a change never needs a prebuild rebuild
+COPY scripts/start.sh /usr/bin/start.sh
+RUN chmod +x /usr/bin/hcf-layout /usr/bin/start.sh
 
 RUN git config --global user.email "hcf@coder" \
       && git config --global user.name "hcf coder"
-RUN mkdir -p /vscode 
-RUN mv ${BASEDIR}/.local /vscode/  
-RUN mv ${BASEDIR}/.cargo /vscode/  
+# Only toolchains stay in /vscode (symlinked by start.sh). .local and .config are real
+# directories on the PVC, so code-server, Kilo, Cline and Claude state survives restarts.
+RUN mkdir -p /vscode
+RUN mv ${BASEDIR}/.cargo /vscode/
 RUN rm -f ${BASEDIR}/.bash_history
-RUN rm -f ${BASEDIR}/.bashrc 
-RUN mv ${BASEDIR}/.profile /vscode/  
-RUN mv ${BASEDIR}/.gitconfig /vscode/ 
-RUN mv ${BASEDIR}/.config /vscode/  
-RUN mv ${BASEDIR}/.rustup /vscode/ 
-RUN mv ${BASEDIR}/go /vscode/ 
+RUN rm -f ${BASEDIR}/.bashrc
+RUN mv ${BASEDIR}/.profile /vscode/
+RUN mv ${BASEDIR}/.gitconfig /vscode/
+RUN mv ${BASEDIR}/.rustup /vscode/
+RUN mv ${BASEDIR}/go /vscode/
 COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json
