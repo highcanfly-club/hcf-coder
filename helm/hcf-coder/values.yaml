@@ -48,6 +48,11 @@ claudeCode:
   # or reference a secret you manage yourself (sops, sealed-secrets...), key defaults to oauth-token
   existingSecret: ""
   existingSecretKey: oauth-token
+vibe:
+  apiKeys: ""
+  # or reference a secret you manage yourself (sops, sealed-secrets...), key defaults to vibe-api-keys
+  existingSecret: ""
+  existingSecretKey: vibe-api-keys
 getKubeconfigONE: 'scp user@some-server:/home/user/.kube/config /dev/stdout'
 getKubeconfigTWO: 'curl https://user:password@some-server/kube.config'
 
