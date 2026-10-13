@@ -71,6 +71,14 @@ spec:
             value: {{ .Values.entangle.relayServer | quote }}
           - name: ENTANGLE_WORDLIST
             value: {{ .Values.entangle.wordlist | quote }}
+          # VIBE_CLI=python if Values.vibe.vibeCLI is "python", VIBE_CLI=rust if Values.vibe.vibeCLI is "rust", VIBE_CLI is unset if Values.vibe.vibeCLI is "auto"
+          {{- if eq .Values.vibe.vibeCLI "python" }}
+          - name: VIBE_CLI
+            value: python
+          {{- else if eq .Values.vibe.vibeCLI "rust" }} 
+          - name: VIBE_CLI
+              value: rust
+          {{- end }}
           {{- if or .Values.claudeCode.oauthToken .Values.claudeCode.existingSecret }}
           - name: CLAUDE_CODE_OAUTH_TOKEN
             valueFrom:

@@ -1,0 +1,559 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HCF-Coder Helm Chart Values Schema",
+  "description": "Schema for validating values.yaml in hcf-coder Helm chart",
+  "type": "object",
+  "properties": {
+    "DEBUG": {
+      "type": "boolean",
+      "description": "Enable debug mode"
+    },
+    "minimal": {
+      "type": "boolean",
+      "description": "Minimal deployment mode"
+    },
+    "dockersock": {
+      "type": "string",
+      "description": "Docker socket path"
+    },
+    "remoteHost": {
+      "type": "string",
+      "description": "Remote SSH host",
+      "format": "ipv4"
+    },
+    "remotePort": {
+      "type": "string",
+      "description": "Remote SSH port",
+      "pattern": "^[0-9]+$"
+    },
+    "remotePath": {
+      "type": "string",
+      "description": "Remote path for SSH"
+    },
+    "publicName": {
+      "type": "string",
+      "description": "Public name for the Code server"
+    },
+    "sshPrivatekey": {
+      "type": "string",
+      "description": "SSH private key"
+    },
+    "sshPublickey": {
+      "type": "string",
+      "description": "SSH public key"
+    },
+    "sshKeyType": {
+      "type": "string",
+      "description": "SSH key type",
+      "enum": ["ecdsa", "rsa", "ed25519", "dsa"]
+    },
+    "livenessProbe": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable liveness probe"
+        }
+      },
+      "additionalProperties": false
+    },
+    "users": {
+      "type": "array",
+      "description": "List of users with their hashed passwords",
+      "items": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "clinepool": {
+      "type": "object",
+      "properties": {
+        "keypool_vault_url": {
+          "type": "string",
+          "description": "Keypool Vault URL",
+          "format": "uri"
+        },
+        "keypool_live_secret": {
+          "type": "string",
+          "description": "Keypool live secret"
+        }
+      },
+      "additionalProperties": false
+    },
+    "locale": {
+      "type": "string",
+      "description": "Display language of the UI",
+      "pattern": "^[a-z]{2}(_[A-Z]{2})?$"
+    },
+    "seedProfiles": {
+      "type": "boolean",
+      "description": "Register Desktop and iPad settings profiles at start"
+    },
+    "hostAliases": {
+      "type": "array",
+      "description": "Extra /etc/hosts entries",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "IP address"
+          },
+          "hostnames": {
+            "type": "array",
+            "description": "List of hostnames",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["ip", "hostnames"],
+        "additionalProperties": false
+      }
+    },
+    "persistence": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable persistence"
+        },
+        "mountPath": {
+          "type": "string",
+          "description": "Mount path for persistence"
+        },
+        "existingClaim": {
+          "type": "string",
+          "description": "Existing PVC claim name"
+        },
+        "storageClass": {
+          "type": "string",
+          "description": "Storage class name"
+        },
+        "size": {
+          "type": "string",
+          "description": "Storage size",
+          "pattern": "^[0-9]+(Gi|Mi|Ti)$"
+        },
+        "accessModes": {
+          "type": "array",
+          "description": "Access modes",
+          "items": {
+            "type": "string",
+            "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod", "ReadWriteManyPod"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "replicaCount": {
+      "type": "integer",
+      "description": "Number of replicas",
+      "minimum": 1
+    },
+    "claudeCode": {
+      "type": "object",
+      "properties": {
+        "oauthToken": {
+          "type": "string",
+          "description": "Claude Code OAuth token"
+        },
+        "existingSecret": {
+          "type": "string",
+          "description": "Existing secret name for OAuth token"
+        },
+        "existingSecretKey": {
+          "type": "string",
+          "description": "Key in existing secret for OAuth token",
+          "default": "oauth-token"
+        }
+      },
+      "additionalProperties": false
+    },
+    "vibe": {
+      "type": "object",
+      "properties": {
+        "apiKeys": {
+          "type": "string",
+          "description": "Vibe API keys"
+        },
+        "existingSecret": {
+          "type": "string",
+          "description": "Existing secret name for Vibe API keys"
+        },
+        "existingSecretKey": {
+          "type": "string",
+          "description": "Key in existing secret for Vibe API keys",
+          "default": "vibe-api-keys"
+        },
+        "vibeCLI": {
+          "type": "string",
+          "description": "Vibe CLI implementation",
+          "enum": ["python", "rust", "auto"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "getKubeconfigONE": {
+      "type": "string",
+      "description": "Command to get kubeconfig ONE"
+    },
+    "getKubeconfigTWO": {
+      "type": "string",
+      "description": "Command to get kubeconfig TWO"
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Image repository"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "description": "Image pull policy",
+          "enum": ["Always", "IfNotPresent", "Never"]
+        },
+        "tag": {
+          "type": "string",
+          "description": "Image tag"
+        },
+        "updateStrategy": {
+          "type": "string",
+          "description": "Update strategy",
+          "enum": ["Recreate", "RollingUpdate"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "description": "Image pull secrets",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    },
+    "nameOverride": {
+      "type": "string",
+      "description": "Override chart name"
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Override full chart name"
+    },
+    "serviceAccount": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Create service account"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Annotations for service account",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Service account name"
+        }
+      },
+      "additionalProperties": false
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Pod annotations",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Pod security context",
+      "properties": {
+        "fsGroup": {
+          "type": "integer"
+        },
+        "runAsNonRoot": {
+          "type": "boolean"
+        },
+        "runAsUser": {
+          "type": "integer"
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean"
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "drop": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "securityContext": {
+      "type": "object",
+      "description": "Container security context",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "drop": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean"
+        },
+        "runAsNonRoot": {
+          "type": "boolean"
+        },
+        "runAsUser": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Service type",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+        },
+        "port": {
+          "type": "integer",
+          "description": "Service port",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "auxiliaryPort": {
+          "type": "integer",
+          "description": "Auxiliary service port",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "additionalProperties": false
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable ingress"
+        },
+        "className": {
+          "type": "string",
+          "description": "Ingress class name"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Ingress annotations",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "description": "Ingress hosts",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string",
+                "description": "Hostname"
+              },
+              "paths": {
+                "type": "array",
+                "description": "Paths",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "pathType": {
+                      "type": "string",
+                      "enum": ["Prefix", "Exact", "ImplementationSpecific"]
+                    }
+                  },
+                  "required": ["path"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["host"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resource limits and requests",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU limit",
+              "pattern": "^[0-9]+m?$"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory limit",
+              "pattern": "^[0-9]+(Gi|Mi|Ti)$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU request",
+              "pattern": "^[0-9]+m?$"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory request",
+              "pattern": "^[0-9]+(Gi|Mi|Ti)$"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "autoscaling": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable autoscaling"
+        },
+        "minReplicas": {
+          "type": "integer",
+          "description": "Minimum replicas",
+          "minimum": 1
+        },
+        "maxReplicas": {
+          "type": "integer",
+          "description": "Maximum replicas",
+          "minimum": 1
+        },
+        "targetCPUUtilizationPercentage": {
+          "type": "integer",
+          "description": "Target CPU utilization percentage",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "targetMemoryUtilizationPercentage": {
+          "type": "integer",
+          "description": "Target memory utilization percentage",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "Node selector",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Tolerations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": ["Exists", "Equal"]
+          },
+          "value": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string",
+            "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
+          },
+          "tolerationSeconds": {
+            "type": "integer"
+          }
+        },
+        "required": ["key", "operator"],
+        "additionalProperties": false
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "description": "Affinity rules",
+      "additionalProperties": true
+    },
+    "oauth2-proxy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable oauth2-proxy"
+        }
+      },
+      "additionalProperties": true
+    },
+    "entangle": {
+      "type": "object",
+      "properties": {
+        "rendezVousServer": {
+          "type": "string",
+          "description": "Rendez-vous server URL",
+          "format": "uri"
+        },
+        "relayServer": {
+          "type": "string",
+          "description": "Relay server URL"
+        },
+        "wordlist": {
+          "type": "string",
+          "description": "Wordlist for magic-wormhole"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

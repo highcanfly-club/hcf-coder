@@ -53,6 +53,8 @@ vibe:
   # or reference a secret you manage yourself (sops, sealed-secrets...), key defaults to vibe-api-keys
   existingSecret: ""
   existingSecretKey: vibe-api-keys
+  # vibeCLI: "python" | "rust" | "auto"
+  vibeCLI: "python"
 getKubeconfigONE: 'scp user@some-server:/home/user/.kube/config /dev/stdout'
 getKubeconfigTWO: 'curl https://user:password@some-server/kube.config'
 
