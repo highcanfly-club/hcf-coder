@@ -122,7 +122,7 @@ COPY --from=astral/uv:trixie /usr/local/bin/uv /usr/local/bin/uv
 COPY --from=downloader /usr/bin/kilo /usr/bin/kilo
 COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
 COPY --from=mistral-builder /mistral-vibe/dist/*.whl /tmp/mistral/
-RUN uv pip install --system /tmp/mistral/*.whl && rm -rf /tmp/mistral
+RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin UV_PYTHON_DOWNLOADS=never uv tool install /tmp/mistral/*.whl && rm -rf /tmp/mistral
 COPY --from=ghcr.io/getsops/sops:v3.13.3 /usr/local/bin/sops /usr/local/bin/sops
 ARG HELM_VERSION="v4.3.0"
 RUN ARCH=$(dpkg --print-architecture) && \
