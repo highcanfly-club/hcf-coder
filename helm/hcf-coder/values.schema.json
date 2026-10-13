@@ -408,6 +408,25 @@
               }
             },
             "required": ["host"],
+            "additionalProperties": true
+          }
+        },
+        "tls": {
+          "type": "array",
+          "description": "TLS configuration",
+          "items": {
+            "type": "object",
+            "properties": {
+              "secretName": {
+                "type": "string"
+              },
+              "hosts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
             "additionalProperties": false
           }
         }
@@ -553,7 +572,17 @@
         }
       },
       "additionalProperties": false
+    },
+    "cloudflared": {
+      "type": "object",
+      "description": "Cloudflared configuration",
+      "additionalProperties": true
+    },
+    "global": {
+      "type": "object",
+      "description": "Global configuration",
+      "additionalProperties": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
