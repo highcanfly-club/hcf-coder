@@ -5,8 +5,9 @@ RUN git clone --depth 1 https://github.com/sctg-development/entangle.git && \
 
 FROM astral/uv:trixie AS mistral-builder
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN apt-get update && apt-get install -y --no-install-recommends curl && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git build-essential pkg-config libasound2-dev && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup.sh && \
+    sh /tmp/rustup.sh -y && \
     . "$HOME/.cargo/env" && \
     git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
