@@ -65,7 +65,7 @@ spec:
             value: {{ .Values.locale | quote }}
           - name: HCF_SEED_PROFILES
             value: {{ .Values.seedProfiles | quote }}
-          - name: ENTANGLE_RENDZVOUS
+          - name: ENTANGLE_RENDEZVOUS
             value: {{ .Values.entangle.rendezVousServer | quote }}
           - name: ENTANGLE_RELAY
             value: {{ .Values.entangle.relayServer | quote }}
@@ -77,6 +77,13 @@ spec:
               secretKeyRef:
                 name: {{ .Values.claudeCode.existingSecret | default "claude-code-credentials" }}
                 key: {{ .Values.claudeCode.existingSecretKey }}
+          {{- end }}
+          {{- if or .Values.vibe.apiKeys .Values.vibe.existingSecret }}
+          - name: VIBE_API_KEYS
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.vibe.existingSecret | default "vibe-api-keys" }}
+                key: {{ .Values.vibe.existingSecretKey }}
           {{- end }}
           - name: GET_KUBECONFIG_ONE
             valueFrom:
