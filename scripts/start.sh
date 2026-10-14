@@ -97,6 +97,6 @@ for LINK in $LINKS ; do
     fi
 done
 
-exec /usr/bin/entrypoint.sh --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 \
+exec /usr/bin/entrypoint.sh --enable-remote-storage --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 \
     --user-data-dir "${USER_DATA_DIR}" --extensions-dir "${EXTENSIONS_DIR}" \
     --app-name "${APPNAME:-HCF Code server}" .
