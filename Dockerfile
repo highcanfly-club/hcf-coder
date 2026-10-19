@@ -131,6 +131,8 @@ RUN ARCH=$(dpkg --print-architecture) && \
     mv /tmp/linux-${HELM_ARCH}/helm /usr/bin/helm && \
     chmod +x /usr/bin/helm
 RUN  /bin/busybox --install -s
+# Create a symlink for claude in /usr/local/bin, claude extension was installed in ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude
+RUN ln -s ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude /usr/local/bin/claude
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
