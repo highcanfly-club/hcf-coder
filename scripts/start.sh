@@ -97,13 +97,16 @@ for LINK in $LINKS ; do
     fi
 done
 
-# Check if LC_ALL is set in .bashrc, if not, add it to the end of the file
-if ! grep -q "export LC_ALL=" "${BASEDIR}/.bashrc"; then
+# Check if LC_ALL is set in .bashrc, if not, add it to the end of the file, if .baschrc does not exist, create it and add the line. This is needed for some locales to work properly.
+if [ ! -f "${HOME}/.bashrc" ]; then
+    touch "${HOME}/.bashrc"
+fi
+if ! grep -q "export LC_ALL=" "${HOME}/.bashrc"; then
     # If ${LOCALE}.UTF-8 exists in locale -a, add it to .bashrc, otherwise use C.UTF-8
     if locale -a | grep -q "${LOCALE}.UTF-8"; then
-        echo "export LC_ALL=${LOCALE}.UTF-8" >> "${BASEDIR}/.bashrc"
+        echo "export LC_ALL=${LOCALE}.UTF-8" >> "${HOME}/.bashrc"
     else
-        echo "export LC_ALL=C.UTF-8" >> "${BASEDIR}/.bashrc"
+        echo "export LC_ALL=C.UTF-8" >> "${HOME}/.bashrc"
     fi
 fi
 
