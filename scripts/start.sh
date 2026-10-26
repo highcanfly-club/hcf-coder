@@ -88,6 +88,19 @@ if [ "${HCF_SEED_PROFILES:-true}" = "true" ] && [ -d "${CONFIG_DIR}/profiles" ];
     fi
 fi
 
+# Check if LC_ALL is set in .bashrc, if not, add it to the end of the file, if .baschrc does not exist, create it and add the line. This is needed for some locales to work properly.
+if [ ! -f "${BASEDIR}/.bashrc" ]; then
+    touch "${BASEDIR}/.bashrc"
+fi
+if ! grep -q "export LC_ALL=" "${BASEDIR}/.bashrc"; then
+    # If ${LOCALE}.UTF-8 exists in locale -a, add it to .bashrc, otherwise use C.UTF-8
+    if locale -a | grep -q "${LOCALE}.UTF-8"; then
+        echo "export LC_ALL=${LOCALE}.UTF-8" >> "${BASEDIR}/.bashrc"
+    else
+        echo "export LC_ALL=C.UTF-8" >> "${BASEDIR}/.bashrc"
+    fi
+fi
+
 # Toolchains kept in the image layer
 LINKS=".cargo .bash_history .bashrc .profile .gitconfig .rustup go"
 for LINK in $LINKS ; do
@@ -97,18 +110,7 @@ for LINK in $LINKS ; do
     fi
 done
 
-# Check if LC_ALL is set in .bashrc, if not, add it to the end of the file, if .baschrc does not exist, create it and add the line. This is needed for some locales to work properly.
-if [ ! -f "${HOME}/.bashrc" ]; then
-    touch "${HOME}/.bashrc"
-fi
-if ! grep -q "export LC_ALL=" "${HOME}/.bashrc"; then
-    # If ${LOCALE}.UTF-8 exists in locale -a, add it to .bashrc, otherwise use C.UTF-8
-    if locale -a | grep -q "${LOCALE}.UTF-8"; then
-        echo "export LC_ALL=${LOCALE}.UTF-8" >> "${HOME}/.bashrc"
-    else
-        echo "export LC_ALL=C.UTF-8" >> "${HOME}/.bashrc"
-    fi
-fi
+
 
 exec /usr/bin/entrypoint.sh --enable-remote-storage --auth none --disable-telemetry --bind-addr 0.0.0.0:8080 \
     --user-data-dir "${USER_DATA_DIR}" --extensions-dir "${EXTENSIONS_DIR}" \
