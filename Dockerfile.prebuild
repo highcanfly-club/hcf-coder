@@ -11,7 +11,7 @@ FROM highcanfly/llvm4msvc:latest AS llvm4msvc
 
 FROM highcanfly/llvm4msvc-x86:latest AS llvm4msvc-x86
 
-FROM codercom/code-server:4.143.0-noble AS coder
+FROM codercom/code-server:4.144.0-noble AS coder
 
 FROM ubuntu:noble
 
@@ -19,7 +19,7 @@ USER 0
 ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.27.2"
+ARG GOVERSION="1.27.3"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR

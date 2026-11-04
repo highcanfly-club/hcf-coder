@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
     uv build --wheel
-FROM codercom/code-server:4.141.0-noble AS coder
+FROM codercom/code-server:4.144.0-noble AS coder
 USER 0
 
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -52,7 +52,7 @@ USER 0
 ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.27.2"
+ARG GOVERSION="1.27.3"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR
