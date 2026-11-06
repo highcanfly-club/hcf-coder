@@ -138,6 +138,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl gpg ca-cer
       && echo "Components: main" >> /etc/apt/sources.list.d/smallstep.sources \
       && echo "Signed-By: /etc/apt/keyrings/smallstep.asc" >> /etc/apt/sources.list.d/smallstep.sources \
       && apt-get update && apt-get -y install step-cli
+# Python modules needed by common Ansible modules/filters (ipaddr, json_query, paramiko, kubernetes.core, password_hash)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-netaddr python3-jmespath python3-paramiko python3-kubernetes python3-passlib python3-yaml \
+      && rm -rf /var/lib/apt/lists/*
 RUN  /bin/busybox --install -s
 # Create a symlink for claude in /usr/local/bin, claude extension was installed in ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude
 RUN ln -s ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude /usr/local/bin/claude

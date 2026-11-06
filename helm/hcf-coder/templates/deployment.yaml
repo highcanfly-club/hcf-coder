@@ -65,6 +65,12 @@ spec:
             value: {{ .Values.locale | quote }}
           - name: HCF_SEED_PROFILES
             value: {{ .Values.seedProfiles | quote }}
+          {{- if and .Values.step.caUrl .Values.step.fingerprint }}
+          - name: STEP_CA_URL
+            value: {{ .Values.step.caUrl | quote }}
+          - name: STEP_FINGERPRINT
+            value: {{ .Values.step.fingerprint | quote }}
+          {{- end }}
           - name: ENTANGLE_RENDEZVOUS
             value: {{ .Values.entangle.rendezVousServer | quote }}
           - name: ENTANGLE_RELAY

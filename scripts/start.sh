@@ -101,6 +101,23 @@ if ! grep -q "export LC_ALL=" "${BASEDIR}/.bashrc"; then
     fi
 fi
 
+# step-cli: trust the private CA, pinned on its root fingerprint (STEP_CA_URL / STEP_FINGERPRINT).
+# State lives in ${BASEDIR}/.step on the PVC. Idempotent, never fatal (CA may be unreachable at start).
+if [ -n "${STEP_CA_URL:-}" ] && [ -n "${STEP_FINGERPRINT:-}" ]; then
+    export STEPPATH=${STEPPATH:-${BASEDIR}/.step}
+    if step ca bootstrap --force --ca-url "$STEP_CA_URL" --fingerprint "$STEP_FINGERPRINT" >/dev/null 2>&1; then
+        echo "step: bootstrapped on $STEP_CA_URL (fingerprint ${STEP_FINGERPRINT:0:12}...)"
+        # Also trust the root system-wide (curl, git, ansible uri...). Needs root, ignored otherwise.
+        step certificate install --all "$STEPPATH/certs/root_ca.crt" >/dev/null 2>&1 || true
+    else
+        echo "WARN: step ca bootstrap failed ($STEP_CA_URL unreachable or fingerprint mismatch)" >&2
+    fi
+    # Make STEPPATH and the CA settings available in every terminal.
+    if ! grep -q "STEPPATH=" "${BASEDIR}/.bashrc" 2>/dev/null; then
+        echo "export STEPPATH=${STEPPATH}" >> "${BASEDIR}/.bashrc"
+    fi
+fi
+
 # Toolchains kept in the image layer
 LINKS=".cargo .bash_history .bashrc .profile .gitconfig .rustup go"
 for LINK in $LINKS ; do

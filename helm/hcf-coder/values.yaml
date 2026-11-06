@@ -23,6 +23,10 @@ clinepool:
 locale: "fr"
 # Register "Desktop" and "iPad" settings profiles at start (experimental)
 seedProfiles: true
+# step-cli bootstrap at start (root CA pinned by fingerprint, stored in ~/.step on the PVC)
+step:
+  caUrl: ""
+  fingerprint: ""
 # Extra /etc/hosts entries, e.g.
 # hostAliases:
 # - ip: 100.64.0.4
