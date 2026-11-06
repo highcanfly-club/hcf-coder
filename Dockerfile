@@ -132,11 +132,11 @@ RUN ARCH=$(dpkg --print-architecture) && \
     chmod +x /usr/bin/helm
 RUN apt-get update && apt-get install -y --no-install-recommends curl gpg ca-certificates \
       && curl -fsSL https://packages.smallstep.com/keys/apt/repo-signing-key.gpg -o /etc/apt/keyrings/smallstep.asc \
-      && echo "Types: deb" > /etc/apt/sources.list.d/smallstep.list \
-      && echo "URIs: https://packages.smallstep.com/stable/debian" >> /etc/apt/sources.list.d/smallstep.list \
-      && echo "Suites: debs" >> /etc/apt/sources.list.d/smallstep.list \
-      && echo "Components: main" >> /etc/apt/sources.list.d/smallstep.list \
-      && echo "Signed-By: /etc/apt/keyrings/smallstep.asc" >> /etc/apt/sources.list.d/smallstep.list \
+      && echo "Types: deb" > /etc/apt/sources.list.d/smallstep.sources \
+      && echo "URIs: https://packages.smallstep.com/stable/debian" >> /etc/apt/sources.list.d/smallstep.sources \
+      && echo "Suites: debs" >> /etc/apt/sources.list.d/smallstep.sources \
+      && echo "Components: main" >> /etc/apt/sources.list.d/smallstep.sources \
+      && echo "Signed-By: /etc/apt/keyrings/smallstep.asc" >> /etc/apt/sources.list.d/smallstep.sources \
       && apt-get update && apt-get -y install step-cli
 RUN  /bin/busybox --install -s
 # Create a symlink for claude in /usr/local/bin, claude extension was installed in ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude
