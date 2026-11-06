@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
     uv build --wheel
-FROM codercom/code-server:4.144.0-noble AS coder
+FROM codercom/code-server:4.145.0-noble AS coder
 USER 0
 
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -124,12 +124,16 @@ COPY --from=downloader /usr/bin/entangle /usr/bin/entangle
 COPY --from=mistral-builder /mistral-vibe/dist/*.whl /tmp/mistral/
 RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin UV_PYTHON_DOWNLOADS=never uv tool install /tmp/mistral/*.whl && rm -rf /tmp/mistral
 COPY --from=ghcr.io/getsops/sops:v3.13.3 /usr/local/bin/sops /usr/local/bin/sops
-ARG HELM_VERSION="v4.3.0"
+ARG HELM_VERSION="v4.3.1"
 RUN ARCH=$(dpkg --print-architecture) && \
     if [ "$ARCH" = "amd64" ]; then HELM_ARCH="amd64"; else HELM_ARCH="arm64"; fi && \
     curl -fsSL "https://get.helm.sh/helm-${HELM_VERSION}-linux-${HELM_ARCH}.tar.gz" | tar -xz -C /tmp && \
     mv /tmp/linux-${HELM_ARCH}/helm /usr/bin/helm && \
     chmod +x /usr/bin/helm
+RUN apt-get update && apt-get install -y --no-install-recommends curl gpg ca-certificates \
+      && curl -fsSL https://packages.smallstep.com/keys/apt/repo-signing-key.gpg -o /etc/apt/keyrings/smallstep.asc \
+      && echo "deb [signed-by=/etc/apt/keyrings/smallstep.asc] https://packages.smallstep.com/stable/debian debs main" | tee /etc/apt/sources.list.d/smallstep.sources \
+      && apt-get update && apt-get -y install step-cli
 RUN  /bin/busybox --install -s
 # Create a symlink for claude in /usr/local/bin, claude extension was installed in ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude
 RUN ln -s ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude /usr/local/bin/claude
