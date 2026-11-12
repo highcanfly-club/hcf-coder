@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
     uv build --wheel
-FROM codercom/code-server:4.145.0-noble AS coder
+FROM codercom/code-server:4.145.2-noble AS coder
 USER 0
 
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -145,6 +145,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN  /bin/busybox --install -s
 # Create a symlink for claude in /usr/local/bin, claude extension was installed in ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude
 RUN ln -s ${EXTENSIONS_DIR}/anthropic.claude-code-*/resources/native-binary/claude /usr/local/bin/claude
+RUN curl -L https://dl.min.io/aistor/mc/release/linux-$(dpkg --print-architecture)/mc.RELEASE.2026-09-19T15-24-59Z > /usr/local/bin/mc && chmod +x /usr/local/bin/mc
 USER 0
 EXPOSE 8080
 ENTRYPOINT [ "/usr/bin/start.sh" ]
