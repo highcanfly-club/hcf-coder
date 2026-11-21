@@ -33,8 +33,8 @@ RUN chmod +x vsixHarvester \
 RUN /usr/bin/clinepool-download -v --vsix --out-file /extensions/clinepool-extensions.vsix
 COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
 RUN --mount=type=secret,id=gh_token,required=false \
-    if [ -s /run/secrets/gh_token ]; then export GITHUB_TOKEN="$(cat /run/secrets/gh_token)"; fi && \
-    /usr/local/bin/kilocode-download --cli --out-file /usr/bin/kilocode && \
+    if [ -s /run/secrets/gh_token ]; then export GITHUB_TOKEN="$(cat /run/secrets/gh_token)"; echo "GITHUB_TOKEN set"; fi && \
+    /usr/bin/kilocode-download --cli --out-file /usr/bin/kilocode && \
     /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo
 COPY --from=entangle-builder /app/entangle /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
