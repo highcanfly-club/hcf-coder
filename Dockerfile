@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     git clone --depth 1 https://github.com/sctg-development/mistral-vibe.git && \
     cd mistral-vibe && \
     uv build --wheel
-FROM codercom/code-server:4.145.2-noble AS coder
+FROM codercom/code-server:4.146.0-noble AS coder
 USER 0
 
 RUN /usr/lib/code-server/bin/code-server -v | sed -ne 's/.*\([0-9]\.[0-9]*\.[0-9A-Za-z-]*\)$/\1/p' > /usr/lib/code-server/engine_version.txt
@@ -32,8 +32,10 @@ RUN chmod +x vsixHarvester \
       && ./vsixHarvester --verbose -i /extensions.json -e $(cat /engine_version.txt)
 RUN /usr/bin/clinepool-download -v --vsix --out-file /extensions/clinepool-extensions.vsix
 COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
-RUN /usr/bin/kilocode-download -v --vsix --out-file /extensions/kilocode-extensions.vsix
-RUN /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo
+RUN --mount=type=secret,id=gh_token,required=false \
+    if [ -s /run/secrets/gh_token ]; then export GITHUB_TOKEN="$(cat /run/secrets/gh_token)"; fi && \
+    /usr/local/bin/kilocode-download --cli --out-file /usr/bin/kilocode && \
+    /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo
 COPY --from=entangle-builder /app/entangle /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
@@ -52,7 +54,7 @@ USER 0
 ARG NODE_MAJOR="24"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
-ARG GOVERSION="1.27.3"
+ARG GOVERSION="1.27.4"
 ENV ENTRYPOINTD=/entrypoint.d
 ENV BASEDIR=/home/coder
 ENV HOME=$BASEDIR

@@ -24,6 +24,8 @@ on:
         required: true
       DOCKER_IMAGE_NAME:
         required: false
+      GITHUB_TOKEN:
+        required: false
 
 env:
   IMAGE: ${{ inputs.image || secrets.DOCKER_IMAGE_NAME }}
@@ -73,6 +75,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          secrets: |
+            gh_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Export digest
         run: |

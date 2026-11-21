@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   prebuild:
+    permissions:
+      contents: read
     if: ${{ github.event_name == 'release' || inputs.prebuild }}
     uses: ./.github/workflows/_build-image.yml
     with:
@@ -29,6 +31,8 @@ jobs:
     secrets: inherit
 
   final:
+    permissions:
+      contents: read
     needs: prebuild
     # run when the prebuild succeeded or was skipped, never when it failed
     if: ${{ !cancelled() && (needs.prebuild.result == 'success' || needs.prebuild.result == 'skipped') }}
