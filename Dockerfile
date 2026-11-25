@@ -34,8 +34,9 @@ RUN /usr/bin/clinepool-download -v --vsix --out-file /extensions/clinepool-exten
 COPY --from=sctg/kilocode-download /usr/local/bin/kilocode-download /usr/bin/kilocode-download
 RUN --mount=type=secret,id=gh_token,required=false \
     if [ -s /run/secrets/gh_token ]; then export GITHUB_TOKEN="$(cat /run/secrets/gh_token)"; echo "GITHUB_TOKEN set"; fi && \
-    /usr/bin/kilocode-download --cli --out-file /usr/bin/kilocode && \
-    /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo
+    /usr/bin/kilocode-download -v --cli --out-file /usr/bin/kilo && \
+    /usr/bin/kilocode-download -v --vsix --out-file /extensions/kilo.vsix && \
+    ln -svf /usr/bin/kilo /usr/bin/kilocode
 COPY --from=entangle-builder /app/entangle /usr/bin/entangle
 RUN mkdir -p extensions/amd64 \
       && mkdir -p extensions/arm64 \
@@ -116,6 +117,7 @@ RUN mv ${BASEDIR}/.profile /vscode/
 RUN mv ${BASEDIR}/.gitconfig /vscode/
 RUN mv ${BASEDIR}/.rustup /vscode/
 RUN mv ${BASEDIR}/go /vscode/
+COPY --from=downloader /usr/bin/kilocode-download /usr/bin/kilocode-download
 COPY --from=downloader /vsixHarvester /usr/bin/vsixHarvester
 COPY --from=downloader /change-vsix-requirements.sh /usr/bin/change-vsix-requirements.sh
 COPY --from=downloader /extensions.json /vsixHarvester.json
