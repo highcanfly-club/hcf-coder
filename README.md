@@ -34,7 +34,7 @@ This is how we run it
     - `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link`
     - `RUSTFLAGS="-Lnative=/usr/share/msvc/crt/lib/x86_64 -Lnative=/usr/share/msvc/sdk/lib/um/x86_64 -Lnative=/usr/share/msvc/sdk/lib/ucrt/x86_64"`
 - clang/llvm
-- clang-cl / llvm-link: shortcuts $CL $LINK
+- clang-cl / llvm-link: shortcuts $MSVC_CL $MSVC_LINK
   - for targetting MSVC x86 use `. /usr/local/bin/msvc-x86.env`
   - for reverting to MSVC x86_64 use `. /usr/local/bin/msvc.env`
 - Test Windows compilation can be found in `/usr/share/msvc/test`
@@ -46,17 +46,17 @@ cd /usr/share/msvc/test
   the test.sh contains:
 ```bash
 #!/bin/bash
-$CL /I include /c src/test.c
-$CL /I include /c src/MainWindow.c
-$CL /I include /c src/AboutDialog.c
+$MSVC_CL /I include /c src/test.c
+$MSVC_CL /I include /c src/MainWindow.c
+$MSVC_CL /I include /c src/AboutDialog.c
 
-$LINK /subsystem:WINDOWS \
+$MSVC_LINK /subsystem:WINDOWS \
     user32.lib kernel32.lib comctl32.lib \
     test.obj MainWindow.obj AboutDialog.obj \
     /out:test.exe
 
-$CL /I include /c src/simpletest.c
-$LINK /subsystem:WINDOWS \
+$MSVC_CL /I include /c src/simpletest.c
+$MSVC_LINK /subsystem:WINDOWS \
     user32.lib kernel32.lib comctl32.lib uuid.lib \
     simpletest.obj \
     /out:simpletest.exe

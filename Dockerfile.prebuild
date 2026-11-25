@@ -82,7 +82,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
 ENV CC_x86_64_pc_windows_msvc="clang-cl" \
     CXX_x86_64_pc_windows_msvc="clang-cl" \
     AR_x86_64_pc_windows_msvc="llvm-lib" \
-    CL_FLAGS="-Wno-unused-command-line-argument -fuse-ld=lld-link /usr/share/msvc/crt/include /usr/share/msvc/sdk/include/ucrt /usr/share/msvc/sdk/include/um /usr/share/msvc/sdk/include/shared" \
+    CL_FLAGS="-Wno-unused-command-line-argument -fuse-ld=lld-link /I /usr/share/msvc/crt/include /I /usr/share/msvc/sdk/include/ucrt /I /usr/share/msvc/sdk/include/um /I /usr/share/msvc/sdk/include/shared" \
     CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER="lld-link" \
     CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS="-Lnative=/usr/share/msvc/crt/lib/x86_64 -Lnative=/usr/share/msvc/sdk/lib/um/x86_64 -Lnative=/usr/share/msvc/sdk/lib/ucrt/x86_64"
 ENV CFLAGS_x86_64_pc_windows_msvc="$CL_FLAGS" \
